@@ -22,9 +22,10 @@ app.use('/api/whatsapp', require('./routes/whatsapp'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-// Serve React build in production
-if (process.env.NODE_ENV === 'production') {
-  const clientDist = path.join(__dirname, '../client/dist');
+// Serve React build when dist exists (production)
+const fs = require('fs');
+const clientDist = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDist)) {
   app.use(express.static(clientDist));
   app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 }

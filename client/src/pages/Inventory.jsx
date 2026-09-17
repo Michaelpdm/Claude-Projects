@@ -118,8 +118,46 @@ export default function Inventory() {
         )}
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden p-0">
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {products.length === 0 ? (
+          <div className="card text-center py-12 text-gray-400">
+            <Package size={32} className="mx-auto mb-2 opacity-30" />No products found
+          </div>
+        ) : products.map(p => (
+          <div key={p.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-start gap-3">
+              {p.image_url
+                ? <img src={p.image_url} alt={p.name} className="w-14 h-14 rounded-xl object-cover border border-gray-200 flex-shrink-0" />
+                : <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0"><Package size={20} className="text-gray-400" /></div>
+              }
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-semibold text-gray-900 text-sm leading-tight">{p.name}</p>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <span className={`font-bold text-sm ${p.stock_quantity < LOW_STOCK ? 'text-red-600' : 'text-gray-900'}`}>{p.stock_quantity}</span>
+                    {p.stock_quantity < LOW_STOCK && <AlertTriangle size={12} className="text-amber-500" />}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {p.category && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{p.category}</span>}
+                  {p.size && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{p.size}</span>}
+                  {p.color && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{p.color}</span>}
+                </div>
+                <p className="text-sm font-bold text-violet-700 mt-1">₦{Number(p.price).toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+              <button className="flex-1 bg-violet-600 text-white text-sm font-medium py-2 rounded-xl" onClick={() => setRestockProduct(p)}>+ Restock</button>
+              <button className="p-2 rounded-xl border border-gray-200 text-violet-600" onClick={() => openEdit(p)}><Edit2 size={16} /></button>
+              <button className="p-2 rounded-xl border border-gray-200 text-red-400" onClick={() => handleDelete(p.id)}><Trash2 size={16} /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
