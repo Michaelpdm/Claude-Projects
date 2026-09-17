@@ -59,7 +59,7 @@ export default function Home() {
         className="w-full bg-gray-900 hover:bg-gray-800 active:scale-95 text-white rounded-2xl py-4 flex items-center justify-center gap-3 font-semibold text-base mb-6 transition-all shadow"
       >
         <div className="bg-violet-500 rounded-lg p-1"><Plus size={18} /></div>
-        Record a Sale
+        Make a Sale
       </button>
 
       {/* Quick Stats Row */}

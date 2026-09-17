@@ -57,6 +57,41 @@ router.post('/', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Bulk sale — multiple items in one checkout, price taken from product record
+router.post('/bulk', async (req, res) => {
+  try {
+    const { items, customer_name, payment_method } = req.body;
+    if (!items || items.length === 0) return res.status(400).json({ error: 'No items' });
+
+    // Validate stock for all items first
+    for (const item of items) {
+      const product = (await pool.query('SELECT * FROM products WHERE id = $1', [item.product_id])).rows[0];
+      if (!product) return res.status(404).json({ error: `Product not found` });
+      if (product.stock_quantity < parseInt(item.quantity)) {
+        return res.status(400).json({ error: `Only ${product.stock_quantity} of "${product.name}" in stock` });
+      }
+    }
+
+    const results = [];
+    for (const item of items) {
+      const product = (await pool.query('SELECT * FROM products WHERE id = $1', [item.product_id])).rows[0];
+      const qty = parseInt(item.quantity);
+      const { rows } = await pool.query(
+        `INSERT INTO sales (product_id, quantity, sale_price, customer_name, payment_method)
+         VALUES ($1,$2,$3,$4,$5) RETURNING *`,
+        [item.product_id, qty, product.price, customer_name||null, payment_method||'cash']
+      );
+      await pool.query(
+        'UPDATE products SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE id = $2',
+        [qty, item.product_id]
+      );
+      results.push({ ...rows[0], product_name: product.name, unit_price: product.price });
+    }
+
+    res.status(201).json(results);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.delete('/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM sales WHERE id = $1', [req.params.id]);
