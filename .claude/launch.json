@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Clothing Store Client",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "cwd": "C:\\Users\\HP\\clothing-store\\client"
+    },
+    {
+      "name": "Clothing Store Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5000,
+      "cwd": "C:\\Users\\HP\\clothing-store\\server"
+    }
+  ]
+}
