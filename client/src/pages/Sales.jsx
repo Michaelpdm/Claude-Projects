@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Minus, X, ShoppingBag, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
+import { Search, Plus, Minus, X, ShoppingBag, CheckCircle, MessageCircle } from 'lucide-react';
 
 const PAYMENT_METHODS = ['Cash', 'Transfer', 'POS'];
 
@@ -81,6 +81,28 @@ export default function Sales() {
     setLoading(false);
   };
 
+  const sendWhatsApp = (phone = '') => {
+    const lines = [
+      `*Receipt*`,
+      `─────────────────`,
+      ...receipt.items.map(i => {
+        const detail = [i.size, i.color].filter(Boolean).join(', ');
+        return `${i.name}${detail ? ` (${detail})` : ''} x${i.quantity}  ${fmt(i.price * i.quantity)}`;
+      }),
+      `─────────────────`,
+      `*Total: ${fmt(receipt.total)}*`,
+      `Payment: ${receipt.payment}`,
+      receipt.customer ? `Customer: ${receipt.customer}` : '',
+      ``,
+      `Thank you! 🙏`,
+    ].filter(l => l !== undefined && !(l === '' && !receipt.customer)).join('\n');
+
+    const url = phone
+      ? `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(lines)}`
+      : `https://wa.me/?text=${encodeURIComponent(lines)}`;
+    window.open(url, '_blank');
+  };
+
   if (receipt) {
     return (
       <div className="p-4 max-w-lg mx-auto flex flex-col items-center justify-center min-h-[70vh]">
@@ -88,9 +110,9 @@ export default function Sales() {
           <CheckCircle size={48} className="text-emerald-500" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-1">Sale Complete!</h2>
-        <p className="text-gray-500 text-sm mb-6">{receipt.payment} payment</p>
+        <p className="text-gray-500 text-sm mb-6">{receipt.payment} payment{receipt.customer ? ` · ${receipt.customer}` : ''}</p>
 
-        <div className="w-full bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mb-6">
+        <div className="w-full bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mb-4">
           {receipt.items.map(i => (
             <div key={i.product_id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
               <div>
@@ -106,9 +128,18 @@ export default function Sales() {
           </div>
         </div>
 
+        {/* WhatsApp send */}
+        <button
+          onClick={() => sendWhatsApp()}
+          className="w-full bg-[#25D366] hover:bg-[#20b558] active:scale-95 text-white rounded-2xl py-4 font-semibold text-base flex items-center justify-center gap-3 mb-3 transition-all"
+        >
+          <MessageCircle size={20} />
+          Send Receipt on WhatsApp
+        </button>
+
         <button
           onClick={() => setReceipt(null)}
-          className="w-full bg-gray-900 text-white rounded-2xl py-4 font-semibold text-base"
+          className="w-full bg-gray-900 text-white rounded-2xl py-3 font-semibold text-base"
         >
           New Sale
         </button>
