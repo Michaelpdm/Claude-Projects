@@ -14,6 +14,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/products', require('./routes/products'));
 app.use('/api/sales', require('./routes/sales'));
+app.use('/api/customers', require('./routes/customers'));
+app.use('/api/expenses', require('./routes/expenses'));
+app.use('/api/returns', require('./routes/returns'));
+app.use('/api/reports', require('./routes/reports'));
 app.use('/api/invoices', require('./routes/invoices'));
 app.use('/api/debits', require('./routes/debits'));
 app.use('/api/messages', require('./routes/messages'));

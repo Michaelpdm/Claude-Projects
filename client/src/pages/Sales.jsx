@@ -5,6 +5,7 @@ const PAYMENT_METHODS = ['Cash', 'Transfer', 'POS'];
 
 export default function Sales() {
   const [products, setProducts] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [summary, setSummary] = useState({ today: { total: 0, count: 0 }, thisWeek: { total: 0, count: 0 }, thisMonth: { total: 0 } });
   const [recentSales, setRecentSales] = useState([]);
   const [search, setSearch] = useState('');
@@ -12,6 +13,13 @@ export default function Sales() {
   const [cart, setCart] = useState([]);
   const [payment, setPayment] = useState('Cash');
   const [customer, setCustomer] = useState('');
+  const [customerId, setCustomerId] = useState(null);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [showCustomerList, setShowCustomerList] = useState(false);
+  const [discount, setDiscount] = useState('');
+  const [returnModal, setReturnModal] = useState(null);
+  const [returnQty, setReturnQty] = useState(1);
+  const [returnReason, setReturnReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [receipt, setReceipt] = useState(null);
@@ -20,14 +28,16 @@ export default function Sales() {
   const fmt = (n) => `₦${Number(n || 0).toLocaleString()}`;
 
   const loadData = async () => {
-    const [sumRes, salesRes, prodRes] = await Promise.all([
+    const [sumRes, salesRes, prodRes, custRes] = await Promise.all([
       fetch('/api/sales/summary').then(r => r.json()),
       fetch('/api/sales').then(r => r.json()),
       fetch('/api/products').then(r => r.json()),
+      fetch('/api/customers').then(r => r.json()),
     ]);
     setSummary(sumRes);
     setRecentSales(salesRes);
     setProducts(prodRes);
+    setCustomers(custRes);
   };
 
   useEffect(() => { loadData(); }, []);
@@ -62,6 +72,31 @@ export default function Sales() {
 
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
+  const discountAmt = parseFloat(discount) || 0;
+  const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()));
+
+  const selectCustomer = (c) => {
+    setCustomerId(c.id);
+    setCustomer(c.name);
+    setCustomerSearch(c.name);
+    setShowCustomerList(false);
+  };
+
+  const handleReturn = async () => {
+    if (!returnModal) return;
+    const res = await fetch('/api/returns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sale_id: returnModal.id, quantity: returnQty, reason: returnReason }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error); return; }
+    setReturnModal(null);
+    setReturnQty(1);
+    setReturnReason('');
+    loadData();
+  };
+
   const completeSale = async () => {
     if (cart.length === 0) return;
     setError('');
@@ -69,13 +104,22 @@ export default function Sales() {
     const res = await fetch('/api/sales/bulk', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: cart.map(i => ({ product_id: i.product_id, quantity: i.quantity })), customer_name: customer || null, payment_method: payment.toLowerCase() }),
+      body: JSON.stringify({
+        items: cart.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+        customer_name: customer || null,
+        customer_id: customerId || null,
+        payment_method: payment.toLowerCase(),
+        discount: discountAmt,
+      }),
     });
     const data = await res.json();
     if (!res.ok) { setError(data.error || 'Sale failed'); setLoading(false); return; }
-    setReceipt({ items: [...cart], total, payment, customer });
+    setReceipt({ items: [...cart], total: total - discountAmt, payment, customer, discount: discountAmt });
     setCart([]);
     setCustomer('');
+    setCustomerId(null);
+    setCustomerSearch('');
+    setDiscount('');
     setPayment('Cash');
     loadData();
     setLoading(false);
@@ -260,15 +304,43 @@ export default function Sales() {
                 ))}
               </div>
 
-              {/* Customer (optional) */}
-              <input className="input mb-3" placeholder="Customer name (optional)"
-                value={customer} onChange={e => setCustomer(e.target.value)} />
+              {/* Discount */}
+              <div className="relative mb-3">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₦</span>
+                <input className="input pl-7" type="number" min="0" placeholder="Discount amount (optional)"
+                  value={discount} onChange={e => setDiscount(e.target.value)} />
+              </div>
+
+              {/* Customer from database */}
+              <div className="relative mb-3">
+                <input className="input" placeholder="Customer (type to search or add name)"
+                  value={customerSearch}
+                  onChange={e => { setCustomerSearch(e.target.value); setCustomer(e.target.value); setCustomerId(null); setShowCustomerList(true); }}
+                  onFocus={() => setShowCustomerList(true)} />
+                {showCustomerList && customerSearch && filteredCustomers.length > 0 && (
+                  <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 max-h-36 overflow-y-auto">
+                    {filteredCustomers.slice(0, 5).map(c => (
+                      <button key={c.id} type="button" onClick={() => selectCustomer(c)}
+                        className="w-full text-left px-4 py-2.5 hover:bg-violet-50 text-sm border-b border-gray-50 last:border-0">
+                        <p className="font-medium text-gray-900">{c.name}</p>
+                        {c.phone && <p className="text-xs text-gray-400">{c.phone}</p>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {discountAmt > 0 && (
+                <div className="flex justify-between items-center text-sm text-gray-500 px-1 mb-2">
+                  <span>Subtotal</span><span>{fmt(total)}</span>
+                </div>
+              )}
 
               {error && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 mb-3">{error}</p>}
 
               <button onClick={completeSale} disabled={loading}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl py-4 font-bold text-base transition-all disabled:opacity-50">
-                {loading ? 'Processing…' : `Complete Sale · ${fmt(total)}`}
+                {loading ? 'Processing…' : `Complete Sale · ${fmt(total - discountAmt)}`}
               </button>
             </>
           )}
@@ -284,19 +356,46 @@ export default function Sales() {
               <p className="text-center text-gray-400 text-sm py-10">No sales yet</p>
             ) : recentSales.slice(0, 20).map(s => (
               <div key={s.id} className="flex items-center justify-between px-4 py-3">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">{s.product_name}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 text-sm truncate">{s.product_name}</p>
                   <p className="text-xs text-gray-400">
                     x{s.quantity} · <span className="capitalize">{s.payment_method}</span>
                     {s.customer_name ? ` · ${s.customer_name}` : ''}
                   </p>
                 </div>
-                <p className="font-bold text-gray-900 text-sm">{fmt(s.sale_price * s.quantity)}</p>
+                <div className="flex items-center gap-2 ml-2">
+                  <p className="font-bold text-gray-900 text-sm">{fmt(s.sale_price * s.quantity)}</p>
+                  <button onClick={() => { setReturnModal(s); setReturnQty(1); setReturnReason(''); }}
+                    className="text-xs text-orange-500 border border-orange-200 px-2 py-0.5 rounded-lg flex-shrink-0">
+                    Return
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Return modal */}
+      {returnModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
+          <div className="bg-white rounded-t-2xl w-full max-w-lg p-6">
+            <h3 className="font-bold text-lg mb-1">Process Return</h3>
+            <p className="text-sm text-gray-500 mb-4">{returnModal.product_name} · sold x{returnModal.quantity}</p>
+            <label className="label">Quantity to return</label>
+            <input className="input mb-3" type="number" min="1" max={returnModal.quantity} value={returnQty}
+              onChange={e => setReturnQty(parseInt(e.target.value))} />
+            <label className="label">Reason (optional)</label>
+            <input className="input mb-4" placeholder="e.g. wrong size, defective" value={returnReason}
+              onChange={e => setReturnReason(e.target.value)} />
+            <p className="text-sm text-gray-500 mb-4">Refund: <strong>{fmt(returnModal.sale_price * returnQty)}</strong> · Stock will be restored</p>
+            <div className="flex gap-3">
+              <button onClick={() => setReturnModal(null)} className="btn-secondary flex-1">Cancel</button>
+              <button onClick={handleReturn} className="flex-1 bg-orange-500 text-white rounded-xl py-3 font-semibold">Confirm Return</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

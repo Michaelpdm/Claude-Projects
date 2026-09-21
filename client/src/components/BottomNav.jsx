@@ -1,17 +1,17 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Package, ShoppingCart, AlertCircle, Settings } from 'lucide-react';
+import { Home, Package, ShoppingCart, Users, MoreHorizontal } from 'lucide-react';
 
 const navItems = [
   { to: '/home', icon: Home, label: 'Home' },
-  { to: '/inventory', icon: Package, label: 'Stock' },
   { to: '/sales', icon: ShoppingCart, label: 'Sales' },
-  { to: '/debits', icon: AlertCircle, label: 'Debts' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/inventory', icon: Package, label: 'Stock' },
+  { to: '/customers', icon: Users, label: 'Customers' },
+  { to: '/more', icon: MoreHorizontal, label: 'More' },
 ];
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex">
       {navItems.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}

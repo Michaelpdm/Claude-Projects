@@ -60,7 +60,7 @@ router.post('/', async (req, res) => {
 // Bulk sale — multiple items in one checkout, price taken from product record
 router.post('/bulk', async (req, res) => {
   try {
-    const { items, customer_name, payment_method } = req.body;
+    const { items, customer_name, customer_id, payment_method, discount } = req.body;
     if (!items || items.length === 0) return res.status(400).json({ error: 'No items' });
 
     // Validate stock for all items first
@@ -72,14 +72,18 @@ router.post('/bulk', async (req, res) => {
       }
     }
 
+    // Spread discount evenly across items (applied to first item for simplicity)
+    const discountAmount = parseFloat(discount) || 0;
     const results = [];
-    for (const item of items) {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
       const product = (await pool.query('SELECT * FROM products WHERE id = $1', [item.product_id])).rows[0];
       const qty = parseInt(item.quantity);
+      const itemDiscount = i === 0 ? discountAmount : 0;
       const { rows } = await pool.query(
-        `INSERT INTO sales (product_id, quantity, sale_price, customer_name, payment_method)
-         VALUES ($1,$2,$3,$4,$5) RETURNING *`,
-        [item.product_id, qty, product.price, customer_name||null, payment_method||'cash']
+        `INSERT INTO sales (product_id, customer_id, quantity, sale_price, discount, customer_name, payment_method)
+         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+        [item.product_id, customer_id||null, qty, product.price, itemDiscount, customer_name||null, payment_method||'cash']
       );
       await pool.query(
         'UPDATE products SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE id = $2',

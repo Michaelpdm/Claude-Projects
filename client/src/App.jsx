@@ -3,6 +3,10 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Inventory from './pages/Inventory';
 import Sales from './pages/Sales';
+import Customers from './pages/Customers';
+import Expenses from './pages/Expenses';
+import Reports from './pages/Reports';
+import More from './pages/More';
 import Invoices from './pages/Invoices';
 import Debits from './pages/Debits';
 import Messages from './pages/Messages';
@@ -17,6 +21,10 @@ export default function App() {
           <Route path="home" element={<Home />} />
           <Route path="inventory" element={<Inventory />} />
           <Route path="sales" element={<Sales />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="expenses" element={<Expenses />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="more" element={<More />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="debits" element={<Debits />} />
           <Route path="messages" element={<Messages />} />
