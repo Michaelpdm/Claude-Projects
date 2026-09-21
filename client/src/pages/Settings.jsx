@@ -1,8 +1,11 @@
 ﻿import { useState, useEffect } from 'react';
-import { Save, Wifi, WifiOff, RefreshCw, LogOut } from 'lucide-react';
+import { Save, Wifi, WifiOff, RefreshCw, LogOut, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 export default function Settings() {
-  const [settings, setSettings] = useState({ owner_available: 'true', store_name: '', store_phone: '' });
+  const [settings, setSettings] = useState({ owner_available: 'true', store_name: '', store_phone: '', owner_pin: '', staff_pin: '' });
+  const [pinInputs, setPinInputs] = useState({ owner_pin: '', staff_pin: '' });
+  const [showPins, setShowPins] = useState({ owner_pin: false, staff_pin: false });
+  const [pinSaving, setPinSaving] = useState('');
   const [waStatus, setWaStatus] = useState('disconnected');
   const [qrCode, setQrCode] = useState(null);
   const [saving, setSaving] = useState('');
@@ -11,6 +14,7 @@ export default function Settings() {
   const loadSettings = async () => {
     const data = await fetch('/api/settings').then(r => r.json());
     setSettings(data);
+    setPinInputs({ owner_pin: data.owner_pin || '', staff_pin: data.staff_pin || '' });
   };
 
   const loadWaStatus = async () => {
@@ -52,6 +56,17 @@ export default function Settings() {
     loadSettings();
   };
 
+  const savePin = async (key) => {
+    const value = pinInputs[key];
+    if (value && (value.length < 4 || !/^\d+$/.test(value))) {
+      alert('PIN must be 4 digits (numbers only), or leave blank to disable.');
+      return;
+    }
+    setPinSaving(key);
+    await saveSetting(key, value);
+    setPinSaving('');
+  };
+
   const toggleOwner = async () => {
     const next = settings.owner_available === 'true' ? 'false' : 'true';
     await saveSetting('owner_available', next);
@@ -84,6 +99,57 @@ export default function Settings() {
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+
+      {/* PIN / Role Security */}
+      <div className="card space-y-5">
+        <div className="flex items-center gap-2 mb-1">
+          <ShieldCheck size={18} className="text-violet-500" />
+          <h2 className="text-base font-semibold text-gray-900">Staff PIN Security</h2>
+        </div>
+        <p className="text-sm text-gray-500 -mt-3">
+          Set a 4-digit PIN for each role. Staff will only see Sales and Stock. Leave blank to disable the login screen.
+        </p>
+
+        {[
+          { key: 'owner_pin', label: 'Owner PIN', desc: 'Full access — reports, finances, settings' },
+          { key: 'staff_pin', label: 'Staff PIN', desc: 'Sales and stock management only' },
+        ].map(({ key, label, desc }) => (
+          <div key={key}>
+            <label className="label">{label}</label>
+            <p className="text-xs text-gray-400 mb-1.5">{desc}</p>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  className="input pr-10 tracking-widest"
+                  type={showPins[key] ? 'text' : 'password'}
+                  maxLength={4}
+                  placeholder="Enter 4-digit PIN"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={pinInputs[key]}
+                  onChange={e => setPinInputs(p => ({ ...p, [key]: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  onClick={() => setShowPins(p => ({ ...p, [key]: !p[key] }))}
+                >
+                  {showPins[key] ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <button
+                className="btn-primary"
+                disabled={pinSaving === key}
+                onClick={() => savePin(key)}
+              >
+                {pinSaving === key ? 'Saving...' : <><Save size={14} /> Save</>}
+              </button>
+            </div>
+            {settings[key] && <p className="text-xs text-emerald-600 mt-1">PIN is set</p>}
+            {!settings[key] && <p className="text-xs text-gray-400 mt-1">No PIN — this role can log in without one</p>}
+          </div>
+        ))}
+      </div>
 
       {/* Owner Availability */}
       <div className="card">

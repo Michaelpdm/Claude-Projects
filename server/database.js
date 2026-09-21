@@ -101,6 +101,11 @@ async function init() {
     ALTER TABLE sales ADD COLUMN IF NOT EXISTS discount REAL DEFAULT 0;
   `);
 
+  // Ensure owner_pin key exists for deployments that predate this migration
+  await pool.query(`
+    INSERT INTO settings (key, value) VALUES ('owner_pin', '') ON CONFLICT (key) DO NOTHING
+  `);
+
   await pool.query(`
     INSERT INTO settings (key, value) VALUES
       ('owner_available', 'true'),
@@ -108,6 +113,7 @@ async function init() {
       ('store_phone', ''),
       ('away_message', ''),
       ('staff_pin', ''),
+      ('owner_pin', ''),
       ('currency', 'NGN')
     ON CONFLICT (key) DO NOTHING
   `);
