@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Edit2, Trash2, Package, AlertTriangle, X, Upload } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const LOW_STOCK = 5;
 const EMPTY_FORM = { name: '', category: '', size: '', color: '', price: '', cost: '', stock_quantity: '', image: null };
@@ -25,14 +26,14 @@ export default function Inventory() {
     if (search) params.set('search', search);
     if (filterCat) params.set('category', filterCat);
     if (filterSize) params.set('size', filterSize);
-    const res = await fetch(`/api/products?${params}`);
+    const res = await apiFetch(`/api/products?${params}`);
     setProducts(await res.json());
   };
 
   const fetchFilters = async () => {
     const [catRes, sizeRes] = await Promise.all([
-      fetch('/api/products/categories'),
-      fetch('/api/products/sizes'),
+      apiFetch('/api/products/categories'),
+      apiFetch('/api/products/sizes'),
     ]);
     setCategories(await catRes.json());
     setSizes(await sizeRes.json());
@@ -74,13 +75,13 @@ export default function Inventory() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this product?')) return;
-    await fetch(`/api/products/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/products/${id}`, { method: 'DELETE' });
     fetchProducts();
   };
 
   const handleRestock = async () => {
     if (!restockQty || isNaN(restockQty)) return;
-    await fetch(`/api/products/${restockProduct.id}/restock`, {
+    await apiFetch(`/api/products/${restockProduct.id}/restock`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quantity: parseInt(restockQty) }),
     });

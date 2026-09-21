@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Users, Plus, Phone, ShoppingBag, X, Edit2, Trash2, ChevronRight } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const EMPTY = { name: '', phone: '', notes: '' };
 
@@ -14,12 +15,12 @@ export default function Customers() {
   const fmt = (n) => `₦${Number(n || 0).toLocaleString()}`;
 
   const load = async () => {
-    const res = await fetch('/api/customers');
+    const res = await apiFetch('/api/customers');
     setCustomers(await res.json());
   };
 
   const loadDetail = async (id) => {
-    const res = await fetch(`/api/customers/${id}`);
+    const res = await apiFetch(`/api/customers/${id}`);
     setSelected(await res.json());
   };
 
@@ -43,7 +44,7 @@ export default function Customers() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this customer?')) return;
-    await fetch(`/api/customers/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/customers/${id}`, { method: 'DELETE' });
     setSelected(null);
     load();
   };

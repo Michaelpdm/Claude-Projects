@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, User, Delete, ArrowLeft } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 export default function PinLogin() {
   const { login } = useAuth();
@@ -11,7 +12,7 @@ export default function PinLogin() {
   const [storeName, setStoreName] = useState('The Fashion Store');
 
   useEffect(() => {
-    fetch('/api/settings')
+    apiFetch('/api/settings')
       .then(r => r.json())
       .then(data => {
         setSettings(data);

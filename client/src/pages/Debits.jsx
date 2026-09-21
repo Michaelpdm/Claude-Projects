@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AlertCircle, Plus, X } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const EMPTY_FORM = { customer_name: '', amount: '', date_due: '', notes: '' };
 
@@ -15,8 +16,8 @@ export default function Debits() {
 
   const reload = async () => {
     const [debRes, sumRes] = await Promise.all([
-      fetch('/api/debits'),
-      fetch('/api/debits/summary'),
+      apiFetch('/api/debits'),
+      apiFetch('/api/debits/summary'),
     ]);
     setDebits(await debRes.json());
     setSummary(await sumRes.json());
@@ -27,7 +28,7 @@ export default function Debits() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await fetch('/api/debits', {
+    await apiFetch('/api/debits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, amount: parseFloat(form.amount) }),
@@ -40,13 +41,13 @@ export default function Debits() {
 
   const handleClear = async (id) => {
     if (!confirm('Mark this debit as cleared?')) return;
-    await fetch(`/api/debits/${id}/clear`, { method: 'POST' });
+    await apiFetch(`/api/debits/${id}/clear`, { method: 'POST' });
     reload();
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this record?')) return;
-    await fetch(`/api/debits/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/debits/${id}`, { method: 'DELETE' });
     reload();
   };
 

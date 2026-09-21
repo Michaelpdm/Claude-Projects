@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { FileText, Plus, X, Printer, Eye } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const STATUSES = ['Draft', 'Sent', 'Paid'];
 const EMPTY_LINE = { description: '', quantity: 1, unit_price: '', subtotal: 0 };
@@ -16,8 +17,8 @@ export default function Invoices() {
 
   const reload = async () => {
     const [invRes, prodRes] = await Promise.all([
-      fetch('/api/invoices'),
-      fetch('/api/products'),
+      apiFetch('/api/invoices'),
+      apiFetch('/api/products'),
     ]);
     setInvoices(await invRes.json());
     setProducts(await prodRes.json());
@@ -54,7 +55,7 @@ export default function Invoices() {
   const handleCreate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await fetch('/api/invoices', {
+    await apiFetch('/api/invoices', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ customer_name: form.customer_name, items: form.items, total }),
@@ -66,7 +67,7 @@ export default function Invoices() {
   };
 
   const updateStatus = async (id, status) => {
-    await fetch(`/api/invoices/${id}/status`, {
+    await apiFetch(`/api/invoices/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -77,7 +78,7 @@ export default function Invoices() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this invoice?')) return;
-    await fetch(`/api/invoices/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/invoices/${id}`, { method: 'DELETE' });
     setViewInvoice(null);
     reload();
   };

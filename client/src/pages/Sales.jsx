@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Search, Plus, Minus, X, ShoppingBag, CheckCircle, MessageCircle } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const PAYMENT_METHODS = ['Cash', 'Transfer', 'POS'];
 
@@ -29,10 +30,10 @@ export default function Sales() {
 
   const loadData = async () => {
     const [sumRes, salesRes, prodRes, custRes] = await Promise.all([
-      fetch('/api/sales/summary').then(r => r.json()),
-      fetch('/api/sales').then(r => r.json()),
-      fetch('/api/products').then(r => r.json()),
-      fetch('/api/customers').then(r => r.json()),
+      apiFetch('/api/sales/summary').then(r => r.json()),
+      apiFetch('/api/sales').then(r => r.json()),
+      apiFetch('/api/products').then(r => r.json()),
+      apiFetch('/api/customers').then(r => r.json()),
     ]);
     setSummary(sumRes);
     setRecentSales(salesRes);
@@ -84,7 +85,7 @@ export default function Sales() {
 
   const handleReturn = async () => {
     if (!returnModal) return;
-    const res = await fetch('/api/returns', {
+    const res = await apiFetch('/api/returns', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sale_id: returnModal.id, quantity: returnQty, reason: returnReason }),
@@ -101,7 +102,7 @@ export default function Sales() {
     if (cart.length === 0) return;
     setError('');
     setLoading(true);
-    const res = await fetch('/api/sales/bulk', {
+    const res = await apiFetch('/api/sales/bulk', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

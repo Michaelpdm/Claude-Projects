@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Plus, AlertTriangle, Clock, TrendingUp, Package, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../utils/api';
 
 export default function Home() {
   const [summary, setSummary] = useState({ today: { total: 0, count: 0 }, thisWeek: { total: 0, count: 0 }, thisMonth: { total: 0 } });
@@ -13,10 +14,10 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/sales/summary').then(r => r.json()),
-      fetch('/api/sales').then(r => r.json()),
-      fetch('/api/products').then(r => r.json()),
-      fetch('/api/settings').then(r => r.json()),
+      apiFetch('/api/sales/summary').then(r => r.json()),
+      apiFetch('/api/sales').then(r => r.json()),
+      apiFetch('/api/products').then(r => r.json()),
+      apiFetch('/api/settings').then(r => r.json()),
     ]).then(([sum, sales, products, settings]) => {
       setSummary(sum);
       setRecentSales((sales || []).slice(0, 5));

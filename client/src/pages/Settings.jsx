@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { Save, Wifi, WifiOff, RefreshCw, LogOut, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 export default function Settings() {
   const [settings, setSettings] = useState({ owner_available: 'true', store_name: '', store_phone: '', owner_pin: '', staff_pin: '' });
@@ -12,19 +13,19 @@ export default function Settings() {
   const [qrLoading, setQrLoading] = useState(false);
 
   const loadSettings = async () => {
-    const data = await fetch('/api/settings').then(r => r.json());
+    const data = await apiFetch('/api/settings').then(r => r.json());
     setSettings(data);
     setPinInputs({ owner_pin: data.owner_pin || '', staff_pin: data.staff_pin || '' });
   };
 
   const loadWaStatus = async () => {
-    const data = await fetch('/api/whatsapp/status').then(r => r.json());
+    const data = await apiFetch('/api/whatsapp/status').then(r => r.json());
     setWaStatus(data.status);
   };
 
   const loadQr = async () => {
     setQrLoading(true);
-    const data = await fetch('/api/whatsapp/qr').then(r => r.json());
+    const data = await apiFetch('/api/whatsapp/qr').then(r => r.json());
     setQrCode(data.qr);
     setWaStatus(data.status);
     setQrLoading(false);
@@ -47,7 +48,7 @@ export default function Settings() {
 
   const saveSetting = async (key, value) => {
     setSaving(key);
-    await fetch(`/api/settings/${key}`, {
+    await apiFetch(`/api/settings/${key}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value }),
@@ -73,14 +74,14 @@ export default function Settings() {
   };
 
   const connectWa = async () => {
-    await fetch('/api/whatsapp/connect', { method: 'POST' });
+    await apiFetch('/api/whatsapp/connect', { method: 'POST' });
     setQrLoading(true);
     setTimeout(loadQr, 3000);
   };
 
   const disconnectWa = async () => {
     if (!confirm('Disconnect WhatsApp? You will need to scan the QR code again.')) return;
-    await fetch('/api/whatsapp/disconnect', { method: 'POST' });
+    await apiFetch('/api/whatsapp/disconnect', { method: 'POST' });
     setWaStatus('disconnected');
     setQrCode(null);
   };

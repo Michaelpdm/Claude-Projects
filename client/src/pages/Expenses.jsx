@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Plus, Trash2, X, TrendingDown } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const CATEGORIES = ['Stock Purchase', 'Rent', 'Transport', 'Salary', 'Utilities', 'Marketing', 'General'];
 const EMPTY = { description: '', amount: '', category: 'General', expense_date: new Date().toISOString().split('T')[0], notes: '' };
@@ -15,8 +16,8 @@ export default function Expenses() {
 
   const load = async () => {
     const [expRes, sumRes] = await Promise.all([
-      fetch('/api/expenses').then(r => r.json()),
-      fetch('/api/expenses/summary').then(r => r.json()),
+      apiFetch('/api/expenses').then(r => r.json()),
+      apiFetch('/api/expenses/summary').then(r => r.json()),
     ]);
     setExpenses(expRes);
     setSummary(sumRes);
@@ -27,7 +28,7 @@ export default function Expenses() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await fetch('/api/expenses', {
+    await apiFetch('/api/expenses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, amount: parseFloat(form.amount) }),
@@ -40,7 +41,7 @@ export default function Expenses() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this expense?')) return;
-    await fetch(`/api/expenses/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/expenses/${id}`, { method: 'DELETE' });
     load();
   };
 

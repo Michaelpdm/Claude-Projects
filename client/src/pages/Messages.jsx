@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, RefreshCw, Phone } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 export default function Messages() {
   const [conversations, setConversations] = useState([]);
@@ -9,13 +10,13 @@ export default function Messages() {
   const bottomRef = useRef();
 
   const fetchConversations = async () => {
-    const data = await fetch('/api/messages').then(r => r.json());
+    const data = await apiFetch('/api/messages').then(r => r.json());
     setConversations(data);
   };
 
   const fetchMessages = async (phone) => {
     setLoading(true);
-    const data = await fetch(`/api/messages/${phone}`).then(r => r.json());
+    const data = await apiFetch(`/api/messages/${phone}`).then(r => r.json());
     setMessages(data);
     setLoading(false);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);

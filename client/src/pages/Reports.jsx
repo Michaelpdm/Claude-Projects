@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Download, Award } from 'lucide-react';
+import { apiFetch } from '../utils/api';
 
 const PERIODS = [
   { key: 'today', label: 'Today' },
@@ -19,8 +20,8 @@ export default function Reports() {
   const load = async () => {
     setLoading(true);
     const [plRes, bsRes] = await Promise.all([
-      fetch(`/api/reports/pl?period=${period}`).then(r => r.json()),
-      fetch('/api/reports/bestsellers').then(r => r.json()),
+      apiFetch(`/api/reports/pl?period=${period}`).then(r => r.json()),
+      apiFetch('/api/reports/bestsellers').then(r => r.json()),
     ]);
     setPL(plRes);
     setBestsellers(bsRes);
