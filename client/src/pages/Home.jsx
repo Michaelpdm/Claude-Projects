@@ -33,8 +33,8 @@ export default function Home() {
     <div className="p-4 max-w-2xl mx-auto">
       {/* Greeting */}
       <div className="mb-5">
-        <p className="text-sm text-gray-500">{greeting}</p>
-        <h1 className="text-2xl font-bold text-gray-900">{storeName}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{greeting}, {storeName}</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Here's how your store is doing today</p>
       </div>
 
       {/* Today's Revenue Card */}
