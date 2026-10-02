@@ -44,12 +44,8 @@ export default function PinLogin() {
       .then(data => {
         setSettings(data);
         if (data.store_name) setStoreName(data.store_name);
-        // If no PINs are configured at all, auto-login as owner
-        if (!data.owner_pin && !data.manager_pin && !data.staff_pin) {
-          login('owner');
-        }
       })
-      .catch(() => login('owner'));
+      .catch(() => setSettings({}));
   }, []);
 
   const handleRoleSelect = (roleKey) => {
