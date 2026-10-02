@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { TrendingDown, BarChart2, FileText, AlertCircle, MessageSquare, Settings, ChevronRight, ShieldCheck, Briefcase, LogOut } from 'lucide-react';
+import { TrendingDown, BarChart2, FileText, AlertCircle, MessageSquare, Settings, ChevronRight, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const ownerItems = [
@@ -37,18 +37,16 @@ export default function More() {
           </button>
         ))}
 
-        {/* Switch role */}
-        {(isManager || isStaff) && (
+        {/* Manager can switch down to Staff only */}
+        {isManager && (
           <button onClick={logout}
             className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-violet-200 transition-colors">
             <div className="rounded-xl p-2.5 bg-violet-50 text-violet-600">
-              {isManager ? <ShieldCheck size={18} /> : <Briefcase size={18} />}
+              <User size={18} />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-semibold text-gray-900 text-sm">
-                {isManager ? 'Switch to Owner' : 'Switch Role'}
-              </p>
-              <p className="text-xs text-gray-400">Sign out and choose a different role</p>
+              <p className="font-semibold text-gray-900 text-sm">Switch to Staff</p>
+              <p className="text-xs text-gray-400">Sign out and log in as staff</p>
             </div>
             <ChevronRight size={16} className="text-gray-300" />
           </button>

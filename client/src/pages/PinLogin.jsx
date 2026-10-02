@@ -125,7 +125,6 @@ export default function PinLogin() {
               </div>
               <div className="text-left">
                 <p className={`font-bold ${dark ? 'text-gray-900' : 'text-white'}`}>{label}</p>
-                <p className={`text-xs ${dark ? 'text-gray-400' : 'text-violet-200'}`}>{desc}</p>
               </div>
             </button>
           ))}
