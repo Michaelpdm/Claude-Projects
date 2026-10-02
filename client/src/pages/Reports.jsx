@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Download, Award } from 'lucide-react';
 import { apiFetch } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 const PERIODS = [
   { key: 'today', label: 'Today' },
@@ -10,6 +11,7 @@ const PERIODS = [
 ];
 
 export default function Reports() {
+  const { isOwner } = useAuth();
   const [period, setPeriod] = useState('month');
   const [pl, setPL] = useState(null);
   const [bestsellers, setBestsellers] = useState([]);
@@ -61,26 +63,28 @@ export default function Reports() {
         <div className="text-center py-10 text-gray-400 text-sm">Loading...</div>
       ) : pl && (
         <>
-          {/* P&L Breakdown */}
-          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm mb-5">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">Profit & Loss</h2>
-              <p className="text-xs text-gray-400">{pl.transactions} transactions · {pl.margin}% margin</p>
+          {/* P&L Breakdown — owner only */}
+          {isOwner && (
+            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm mb-5">
+              <div className="px-4 py-3 border-b border-gray-100">
+                <h2 className="font-semibold text-gray-900">Profit & Loss</h2>
+                <p className="text-xs text-gray-400">{pl.transactions} transactions · {pl.margin}% margin</p>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {plRows.map(row => (
+                  <div key={row.label} className={`flex items-center justify-between px-4 py-3 ${row.bg}`}>
+                    <span className={`text-sm ${row.bold ? 'font-bold text-gray-900' : 'text-gray-600'}`}>{row.label}</span>
+                    <span className={`font-${row.bold ? 'bold' : 'semibold'} ${row.large ? 'text-xl' : 'text-sm'} ${row.color}`}>
+                      {row.value >= 0 ? '' : '-'}{fmt(Math.abs(row.value))}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="divide-y divide-gray-50">
-              {plRows.map(row => (
-                <div key={row.label} className={`flex items-center justify-between px-4 py-3 ${row.bg}`}>
-                  <span className={`text-sm ${row.bold ? 'font-bold text-gray-900' : 'text-gray-600'}`}>{row.label}</span>
-                  <span className={`font-${row.bold ? 'bold' : 'semibold'} ${row.large ? 'text-xl' : 'text-sm'} ${row.color}`}>
-                    {row.value >= 0 ? '' : '-'}{fmt(Math.abs(row.value))}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
 
-          {/* Profit meter */}
-          {pl.revenue > 0 && (
+          {/* Profit meter — owner only */}
+          {isOwner && pl.revenue > 0 && (
             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mb-5">
               <div className="flex justify-between text-xs text-gray-500 mb-1">
                 <span>Profit margin</span>

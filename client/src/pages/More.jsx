@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { TrendingDown, BarChart2, FileText, AlertCircle, MessageSquare, Settings, ChevronRight, ShieldCheck, LogOut } from 'lucide-react';
+import { TrendingDown, BarChart2, FileText, AlertCircle, MessageSquare, Settings, ChevronRight, ShieldCheck, Briefcase, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const ownerItems = [
@@ -11,52 +11,21 @@ const ownerItems = [
   { to: '/settings', icon: Settings, label: 'Settings', desc: 'Store name, PIN, preferences', color: 'bg-gray-100 text-gray-600' },
 ];
 
+const managerItems = [
+  { to: '/reports', icon: BarChart2, label: 'Reports & Best Sellers', desc: 'Sales performance, top products', color: 'bg-violet-50 text-violet-600' },
+];
+
 export default function More() {
   const navigate = useNavigate();
-  const { isStaff, isOwner, logout } = useAuth();
+  const { isOwner, isManager, isStaff, logout } = useAuth();
 
-  if (isStaff) {
-    return (
-      <div className="p-4 max-w-2xl mx-auto">
-        <h1 className="text-xl font-bold text-gray-900 mb-5">More</h1>
-        <div className="space-y-2">
-          <button
-            onClick={logout}
-            className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-violet-200 transition-colors"
-          >
-            <div className="rounded-xl p-2.5 bg-violet-50 text-violet-600">
-              <ShieldCheck size={18} />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="font-semibold text-gray-900 text-sm">Switch to Owner</p>
-              <p className="text-xs text-gray-400">Log out to sign in as Owner</p>
-            </div>
-            <ChevronRight size={16} className="text-gray-300" />
-          </button>
-
-          <button
-            onClick={logout}
-            className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-red-100 transition-colors"
-          >
-            <div className="rounded-xl p-2.5 bg-red-50 text-red-500">
-              <LogOut size={18} />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="font-semibold text-gray-900 text-sm">Sign Out</p>
-              <p className="text-xs text-gray-400">Return to the login screen</p>
-            </div>
-            <ChevronRight size={16} className="text-gray-300" />
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const items = isOwner ? ownerItems : isManager ? managerItems : [];
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <h1 className="text-xl font-bold text-gray-900 mb-5">More</h1>
       <div className="space-y-2">
-        {ownerItems.map(({ to, icon: Icon, label, desc, color }) => (
+        {items.map(({ to, icon: Icon, label, desc, color }) => (
           <button key={to} onClick={() => navigate(to)}
             className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-violet-200 transition-colors">
             <div className={`rounded-xl p-2.5 ${color}`}><Icon size={18} /></div>
@@ -68,13 +37,27 @@ export default function More() {
           </button>
         ))}
 
-        <button
-          onClick={logout}
-          className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-red-100 transition-colors mt-4"
-        >
-          <div className="rounded-xl p-2.5 bg-red-50 text-red-500">
-            <LogOut size={18} />
-          </div>
+        {/* Switch role */}
+        {(isManager || isStaff) && (
+          <button onClick={logout}
+            className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-violet-200 transition-colors">
+            <div className="rounded-xl p-2.5 bg-violet-50 text-violet-600">
+              {isManager ? <ShieldCheck size={18} /> : <Briefcase size={18} />}
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-semibold text-gray-900 text-sm">
+                {isManager ? 'Switch to Owner' : 'Switch Role'}
+              </p>
+              <p className="text-xs text-gray-400">Sign out and choose a different role</p>
+            </div>
+            <ChevronRight size={16} className="text-gray-300" />
+          </button>
+        )}
+
+        {/* Sign out — all roles */}
+        <button onClick={logout}
+          className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm hover:border-red-100 transition-colors mt-2">
+          <div className="rounded-xl p-2.5 bg-red-50 text-red-500"><LogOut size={18} /></div>
           <div className="flex-1 text-left">
             <p className="font-semibold text-gray-900 text-sm">Sign Out</p>
             <p className="text-xs text-gray-400">Return to role selection</p>

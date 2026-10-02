@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { Home, Package, ShoppingCart, Users, MoreHorizontal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const ownerNav = [
+const fullNav = [
   { to: '/home', icon: Home, label: 'Home' },
   { to: '/sales', icon: ShoppingCart, label: 'Sales' },
   { to: '/inventory', icon: Package, label: 'Stock' },
@@ -17,7 +17,7 @@ const staffNav = [
 
 export default function BottomNav() {
   const { isStaff } = useAuth();
-  const navItems = isStaff ? staffNav : ownerNav;
+  const navItems = isStaff ? staffNav : fullNav;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex">

@@ -71,11 +71,12 @@ export default function Settings() {
     setShowConfirm(false);
   };
 
+  const pinKeyFor = (role) => role === 'owner' ? 'owner_pin' : role === 'manager' ? 'manager_pin' : 'staff_pin';
+
   const savePin = async () => {
     if (!newPin) {
-      // Clearing the PIN
       setPinSaving(true);
-      await saveSetting(pinModal === 'owner' ? 'owner_pin' : 'staff_pin', '');
+      await saveSetting(pinKeyFor(pinModal), '');
       setPinSaving(false);
       setPinModal(null);
       return;
@@ -83,7 +84,7 @@ export default function Settings() {
     if (!/^\d{4}$/.test(newPin)) { setPinError('PIN must be exactly 4 digits.'); return; }
     if (newPin !== confirmPin) { setPinError('PINs do not match.'); return; }
     setPinSaving(true);
-    await saveSetting(pinModal === 'owner' ? 'owner_pin' : 'staff_pin', newPin);
+    await saveSetting(pinKeyFor(pinModal), newPin);
     setPinSaving(false);
     setPinModal(null);
   };
@@ -133,44 +134,27 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {/* Owner PIN */}
-          <div className="rounded-xl border border-gray-100 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-sm font-semibold text-gray-800">Owner PIN</p>
-                <p className="text-xs text-gray-400">Full access to everything</p>
+        <div className="grid grid-cols-1 gap-3">
+          {[
+            { role: 'owner', label: 'Owner PIN', desc: 'Full access to everything', pinKey: 'owner_pin', style: 'btn-primary' },
+            { role: 'manager', label: 'Manager PIN', desc: 'Sales, stock, customers & reports', pinKey: 'manager_pin', style: 'btn-secondary' },
+            { role: 'staff', label: 'Staff PIN', desc: 'Sales and stock only', pinKey: 'staff_pin', style: 'btn-secondary' },
+          ].map(({ role, label, desc, pinKey, style }) => (
+            <div key={role} className="rounded-xl border border-gray-100 p-4 flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-gray-800">{label}</p>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${settings[pinKey] ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                    {settings[pinKey] ? 'Set' : 'Not set'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
               </div>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${settings.owner_pin ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
-                {settings.owner_pin ? 'Set' : 'Not set'}
-              </span>
+              <button onClick={() => openPinModal(role)} className={`${style} text-sm py-2 px-3 whitespace-nowrap flex-shrink-0`}>
+                <Key size={13} /> {settings[pinKey] ? 'Change' : 'Set PIN'}
+              </button>
             </div>
-            <button
-              onClick={() => openPinModal('owner')}
-              className="w-full btn-primary text-sm py-2"
-            >
-              <Key size={13} /> {settings.owner_pin ? 'Change PIN' : 'Set PIN'}
-            </button>
-          </div>
-
-          {/* Staff PIN */}
-          <div className="rounded-xl border border-gray-100 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-sm font-semibold text-gray-800">Staff PIN</p>
-                <p className="text-xs text-gray-400">Sales and stock only</p>
-              </div>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${settings.staff_pin ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
-                {settings.staff_pin ? 'Set' : 'Not set'}
-              </span>
-            </div>
-            <button
-              onClick={() => openPinModal('staff')}
-              className="w-full btn-secondary text-sm py-2"
-            >
-              <Key size={13} /> {settings.staff_pin ? 'Change PIN' : 'Set PIN'}
-            </button>
-          </div>
+          ))}
         </div>
 
         <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 flex gap-3">
@@ -304,10 +288,10 @@ export default function Settings() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-900">
-                {pinModal === 'owner' ? 'Change Owner PIN' : 'Change Staff PIN'}
+                {pinModal === 'owner' ? 'Owner PIN' : pinModal === 'manager' ? 'Manager PIN' : 'Staff PIN'}
               </h2>
               <p className="text-sm text-gray-400 mt-1">
-                {pinModal === 'owner' ? 'Full access — reports, finances, all settings' : 'Sales and stock access only'}
+                {pinModal === 'owner' ? 'Full access — reports, finances, all settings' : pinModal === 'manager' ? 'Sales, stock, customers & reports' : 'Sales and stock access only'}
               </p>
             </div>
             <div className="p-6 space-y-4">
