@@ -50,8 +50,8 @@ export default function PinLogin() {
 
   const handleRoleSelect = (roleKey) => {
     const roleDef = ROLES.find(r => r.key === roleKey);
-    const requiredPin = settings?.[roleDef.pinKey];
-    if (!requiredPin) {
+    const pinStatus = settings?.[roleDef.pinKey];
+    if (!pinStatus) {
       login(roleKey);
       return;
     }
@@ -73,13 +73,21 @@ export default function PinLogin() {
     setError('');
   };
 
-  const checkPin = (entered) => {
-    const roleDef = ROLES.find(r => r.key === selectedRole);
-    const requiredPin = settings?.[roleDef.pinKey];
-    if (entered === requiredPin) {
-      login(selectedRole);
-    } else {
-      setError('Wrong PIN. Try again.');
+  const checkPin = async (entered) => {
+    try {
+      const res = await apiFetch('/api/settings/verify-pin', {
+        method: 'POST',
+        body: JSON.stringify({ role: selectedRole, pin: entered }),
+      });
+      const { ok } = await res.json();
+      if (ok) {
+        login(selectedRole);
+      } else {
+        setError('Wrong PIN. Try again.');
+        setPin('');
+      }
+    } catch {
+      setError('Could not verify PIN. Try again.');
       setPin('');
     }
   };
