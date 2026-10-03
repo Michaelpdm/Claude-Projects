@@ -76,7 +76,44 @@ export default function Debits() {
         </div>
       </div>
 
-      <div className="card overflow-hidden p-0">
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {debits.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 text-sm">No debits recorded</div>
+        ) : debits.map(d => {
+          const isOverdue = d.status === 'Pending' && d.date_due && d.date_due < today;
+          return (
+            <div key={d.id} className={`bg-white border rounded-2xl p-4 shadow-sm ${isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-100'}`}>
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <p className="font-semibold text-gray-900">{d.customer_name}</p>
+                  {d.notes && <p className="text-xs text-gray-400 mt-0.5">{d.notes}</p>}
+                </div>
+                <p className="font-bold text-red-600 text-lg flex-shrink-0">{fmt(d.amount)}</p>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={d.status === 'Cleared' ? 'badge-green' : isOverdue ? 'badge-red' : 'badge-amber'}>
+                    {isOverdue ? 'Overdue' : d.status}
+                  </span>
+                  {d.date_due && <span className="text-xs text-gray-400">Due {d.date_due}</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  {d.status === 'Pending' && (
+                    <button className="btn-success text-xs py-1.5 px-3" onClick={() => handleClear(d.id)}>Mark Cleared</button>
+                  )}
+                  <button className="p-1.5 rounded-lg border border-gray-200 text-red-400" onClick={() => handleDelete(d.id)}>
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
@@ -103,8 +140,7 @@ export default function Debits() {
                     <td className="table-td">
                       {d.date_due
                         ? <span className={isOverdue ? 'text-red-600 font-medium' : ''}>{d.date_due}{isOverdue && ' (Overdue)'}</span>
-                        : <span className="text-gray-400">--</span>
-                      }
+                        : <span className="text-gray-400">--</span>}
                     </td>
                     <td className="table-td">
                       <span className={d.status === 'Cleared' ? 'badge-green' : isOverdue ? 'badge-red' : 'badge-amber'}>

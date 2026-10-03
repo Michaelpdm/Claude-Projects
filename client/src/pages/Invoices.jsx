@@ -97,8 +97,78 @@ export default function Invoices() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Invoice list */}
+      {/* Mobile: invoice detail view (full page) */}
+      {viewInvoice && (
+        <div className="md:hidden">
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={() => setViewInvoice(null)} className="flex items-center gap-1 text-violet-600 text-sm font-medium">
+              ← Back to invoices
+            </button>
+            <div className="flex items-center gap-2">
+              <button className="btn-secondary py-1.5 px-2.5 text-xs" onClick={() => window.print()}>
+                <Printer size={14} /> Print
+              </button>
+              <button className="p-1.5 rounded-lg border border-red-100 text-red-500" onClick={() => handleDelete(viewInvoice.id)}>
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-gray-900">Invoice #{viewInvoice.id}</h2>
+              <select className="input w-28 text-xs" value={viewInvoice.status} onChange={e => updateStatus(viewInvoice.id, e.target.value)}>
+                {STATUSES.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div className="border-b border-gray-100 pb-4 mb-4">
+              <p className="text-sm text-gray-500">Bill To</p>
+              <p className="font-semibold text-gray-900">{viewInvoice.customer_name}</p>
+              <p className="text-xs text-gray-400">{viewInvoice.created_at?.slice(0, 10)}</p>
+            </div>
+            <div className="space-y-2 mb-4">
+              {(typeof viewInvoice.items === 'string' ? JSON.parse(viewInvoice.items) : viewInvoice.items).map((it, i) => (
+                <div key={i} className="flex justify-between items-start py-2 border-b border-gray-50">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{it.description}</p>
+                    <p className="text-xs text-gray-400">x{it.quantity} @ {fmt(it.unit_price)}</p>
+                  </div>
+                  <p className="font-semibold text-sm text-gray-900">{fmt(it.subtotal)}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+              <span className="font-semibold text-gray-700">Total</span>
+              <p className="text-2xl font-bold">{fmt(viewInvoice.total)}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: invoice list */}
+      {!viewInvoice && (
+        <div className="md:hidden space-y-3">
+          {invoices.length === 0 ? (
+            <div className="text-center py-12 text-gray-400 text-sm">
+              <FileText size={28} className="mx-auto mb-2 opacity-30" />No invoices yet
+            </div>
+          ) : invoices.map(inv => (
+            <button key={inv.id} onClick={() => setViewInvoice(inv)}
+              className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center justify-between shadow-sm text-left">
+              <div>
+                <p className="font-semibold text-gray-900">{inv.customer_name}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{inv.created_at?.slice(0, 10)}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-gray-900">{fmt(inv.total)}</p>
+                <span className={`text-xs mt-1 inline-block ${statusColor(inv.status)}`}>{inv.status}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Desktop: side by side */}
+      <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card overflow-hidden p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -135,29 +205,21 @@ export default function Invoices() {
           </div>
         </div>
 
-        {/* Invoice view / print */}
         {viewInvoice ? (
           <div className="card">
-            <div className="flex items-center justify-between mb-4 no-print">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-gray-900">Invoice #{viewInvoice.id}</h2>
               <div className="flex items-center gap-2">
-                <select className="input w-28 text-xs"
-                  value={viewInvoice.status}
-                  onChange={e => updateStatus(viewInvoice.id, e.target.value)}>
+                <select className="input w-28 text-xs" value={viewInvoice.status} onChange={e => updateStatus(viewInvoice.id, e.target.value)}>
                   {STATUSES.map(s => <option key={s}>{s}</option>)}
                 </select>
                 <button className="btn-secondary py-1.5 px-2.5 text-xs" onClick={() => window.print()}>
                   <Printer size={14} /> Print
                 </button>
-                <button className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 no-print" onClick={() => handleDelete(viewInvoice.id)}>
+                <button className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" onClick={() => handleDelete(viewInvoice.id)}>
                   <X size={14} />
                 </button>
               </div>
-            </div>
-
-            {/* Printable area */}
-            <div className="print-only text-center mb-6">
-              <h1 className="text-2xl font-bold">INVOICE</h1>
             </div>
             <div className="border-b border-gray-100 pb-4 mb-4">
               <p className="text-sm text-gray-500">Bill To</p>
@@ -219,41 +281,40 @@ export default function Invoices() {
                 <div className="flex items-center justify-between mb-2">
                   <label className="label mb-0">Items</label>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {form.items.map((it, i) => (
-                    <div key={i} className="grid grid-cols-12 gap-2 items-end">
-                      <div className="col-span-5">
-                        {i === 0 && <p className="text-xs text-gray-400 mb-1">Description</p>}
-                        <input className="input text-sm" placeholder="Item name" value={it.description}
-                          list={`products-${i}`}
-                          onChange={e => {
-                            updateLine(i, 'description', e.target.value);
-                            const match = products.find(p => p.name === e.target.value);
-                            if (match) autoFill(i, match);
-                          }} />
-                        <datalist id={`products-${i}`}>{products.map(p => <option key={p.id} value={p.name} />)}</datalist>
-                      </div>
-                      <div className="col-span-2">
-                        {i === 0 && <p className="text-xs text-gray-400 mb-1">Qty</p>}
-                        <input className="input text-sm" type="number" min="1" value={it.quantity}
-                          onChange={e => updateLine(i, 'quantity', e.target.value)} />
-                      </div>
-                      <div className="col-span-3">
-                        {i === 0 && <p className="text-xs text-gray-400 mb-1">Unit Price (₦)</p>}
-                        <input className="input text-sm" type="number" min="0" value={it.unit_price}
-                          onChange={e => updateLine(i, 'unit_price', e.target.value)} />
-                      </div>
-                      <div className="col-span-1">
-                        {i === 0 && <p className="text-xs text-gray-400 mb-1">&nbsp;</p>}
-                        <p className="text-sm font-medium py-2">{fmt(it.subtotal || 0)}</p>
-                      </div>
-                      <div className="col-span-1">
-                        {i === 0 && <p className="text-xs mb-1">&nbsp;</p>}
+                    <div key={i} className="bg-gray-50 rounded-xl p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium text-gray-500">Item {i + 1}</p>
                         {form.items.length > 1 && (
-                          <button type="button" className="p-1.5 text-red-400 hover:text-red-600" onClick={() => removeLine(i)}>
+                          <button type="button" className="text-red-400 p-1" onClick={() => removeLine(i)}>
                             <X size={14} />
                           </button>
                         )}
+                      </div>
+                      <input className="input text-sm" placeholder="Description" value={it.description}
+                        list={`products-${i}`}
+                        onChange={e => {
+                          updateLine(i, 'description', e.target.value);
+                          const match = products.find(p => p.name === e.target.value);
+                          if (match) autoFill(i, match);
+                        }} />
+                      <datalist id={`products-${i}`}>{products.map(p => <option key={p.id} value={p.name} />)}</datalist>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <p className="text-xs text-gray-400 mb-1">Qty</p>
+                          <input className="input text-sm" type="number" min="1" value={it.quantity}
+                            onChange={e => updateLine(i, 'quantity', e.target.value)} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 mb-1">Unit Price (₦)</p>
+                          <input className="input text-sm" type="number" min="0" value={it.unit_price}
+                            onChange={e => updateLine(i, 'unit_price', e.target.value)} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400 mb-1">Subtotal</p>
+                          <p className="text-sm font-semibold text-gray-900 py-2">{fmt(it.subtotal || 0)}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
