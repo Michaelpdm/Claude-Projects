@@ -55,8 +55,8 @@ export default function Debits() {
     <div className="p-4 md:p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Debits (BNPL)</h1>
-          <p className="text-sm text-gray-500">Buy Now Pay Later tracking</p>
+          <h1 className="text-xl md:text-2xl font-bold text-zinc-50">Debits (BNPL)</h1>
+          <p className="text-sm text-zinc-400">Buy Now Pay Later tracking</p>
         </div>
         <button className="btn-primary text-xs md:text-sm px-3 md:px-4" onClick={() => setShowForm(true)}>
           <Plus size={14} /> Add Debit
@@ -69,9 +69,9 @@ export default function Debits() {
             <AlertCircle size={24} className="text-red-500" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Total Outstanding</p>
+            <p className="text-sm text-zinc-400">Total Outstanding</p>
             <p className="text-3xl font-bold text-red-600">{fmt(summary.totalOutstanding)}</p>
-            <p className="text-xs text-gray-400">{summary.count || 0} pending debits</p>
+            <p className="text-xs text-zinc-500">{summary.count || 0} pending debits</p>
           </div>
         </div>
       </div>
@@ -79,15 +79,15 @@ export default function Debits() {
       {/* Mobile cards */}
       <div className="md:hidden space-y-3">
         {debits.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 text-sm">No debits recorded</div>
+          <div className="text-center py-12 text-zinc-500 text-sm">No debits recorded</div>
         ) : debits.map(d => {
           const isOverdue = d.status === 'Pending' && d.date_due && d.date_due < today;
           return (
-            <div key={d.id} className={`bg-white border rounded-2xl p-4 shadow-sm ${isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-100'}`}>
+            <div key={d.id} className={`bg-zinc-900 border rounded-2xl p-4 shadow-sm ${isOverdue ? 'border-red-200 bg-red-50' : 'border-zinc-800'}`}>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
-                  <p className="font-semibold text-gray-900">{d.customer_name}</p>
-                  {d.notes && <p className="text-xs text-gray-400 mt-0.5">{d.notes}</p>}
+                  <p className="font-semibold text-zinc-50">{d.customer_name}</p>
+                  {d.notes && <p className="text-xs text-zinc-500 mt-0.5">{d.notes}</p>}
                 </div>
                 <p className="font-bold text-red-600 text-lg flex-shrink-0">{fmt(d.amount)}</p>
               </div>
@@ -96,13 +96,13 @@ export default function Debits() {
                   <span className={d.status === 'Cleared' ? 'badge-green' : isOverdue ? 'badge-red' : 'badge-amber'}>
                     {isOverdue ? 'Overdue' : d.status}
                   </span>
-                  {d.date_due && <span className="text-xs text-gray-400">Due {d.date_due}</span>}
+                  {d.date_due && <span className="text-xs text-zinc-500">Due {d.date_due}</span>}
                 </div>
                 <div className="flex items-center gap-2">
                   {d.status === 'Pending' && (
                     <button className="btn-success text-xs py-1.5 px-3" onClick={() => handleClear(d.id)}>Mark Cleared</button>
                   )}
-                  <button className="p-1.5 rounded-lg border border-gray-200 text-red-400" onClick={() => handleDelete(d.id)}>
+                  <button className="p-1.5 rounded-lg border border-zinc-700 text-red-400" onClick={() => handleDelete(d.id)}>
                     <X size={14} />
                   </button>
                 </div>
@@ -116,7 +116,7 @@ export default function Debits() {
       <div className="hidden md:block card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-zinc-950 border-b border-zinc-800">
               <tr>
                 <th className="table-th">Customer</th>
                 <th className="table-th">Amount</th>
@@ -125,22 +125,22 @@ export default function Debits() {
                 <th className="table-th">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-zinc-800">
               {debits.length === 0 ? (
-                <tr><td colSpan={5} className="table-td text-center text-gray-400 py-10">No debits recorded</td></tr>
+                <tr><td colSpan={5} className="table-td text-center text-zinc-500 py-10">No debits recorded</td></tr>
               ) : debits.map(d => {
                 const isOverdue = d.status === 'Pending' && d.date_due && d.date_due < today;
                 return (
-                  <tr key={d.id} className={`hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`}>
+                  <tr key={d.id} className={`hover:bg-zinc-800 ${isOverdue ? 'bg-red-50' : ''}`}>
                     <td className="table-td">
-                      <p className="font-medium text-gray-900">{d.customer_name}</p>
-                      {d.notes && <p className="text-xs text-gray-400">{d.notes}</p>}
+                      <p className="font-medium text-zinc-50">{d.customer_name}</p>
+                      {d.notes && <p className="text-xs text-zinc-500">{d.notes}</p>}
                     </td>
                     <td className="table-td font-semibold text-red-600">{fmt(d.amount)}</td>
                     <td className="table-td">
                       {d.date_due
                         ? <span className={isOverdue ? 'text-red-600 font-medium' : ''}>{d.date_due}{isOverdue && ' (Overdue)'}</span>
-                        : <span className="text-gray-400">--</span>}
+                        : <span className="text-zinc-500">--</span>}
                     </td>
                     <td className="table-td">
                       <span className={d.status === 'Cleared' ? 'badge-green' : isOverdue ? 'badge-red' : 'badge-amber'}>
@@ -167,10 +167,10 @@ export default function Debits() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+          <div className="bg-zinc-900 rounded-2xl shadow-xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-lg font-semibold">New Debit Record</h2>
-              <button onClick={() => setShowForm(false)}><X size={20} className="text-gray-400 hover:text-gray-600" /></button>
+              <button onClick={() => setShowForm(false)}><X size={20} className="text-zinc-500 hover:text-zinc-300" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
@@ -206,3 +206,4 @@ export default function Debits() {
     </div>
   );
 }
+

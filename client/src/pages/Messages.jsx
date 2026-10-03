@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, RefreshCw, Phone, ChevronLeft } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
@@ -41,34 +41,34 @@ export default function Messages() {
 
   const ConversationList = () => (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900">Messages</h2>
-        <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500" onClick={fetchConversations}>
+      <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+        <h2 className="font-semibold text-zinc-50">Messages</h2>
+        <button className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400" onClick={fetchConversations}>
           <RefreshCw size={15} />
         </button>
       </div>
       <div className="flex-1 overflow-y-auto">
         {conversations.length === 0 ? (
-          <div className="p-6 text-center text-gray-400 text-sm">
+          <div className="p-6 text-center text-zinc-500 text-sm">
             <MessageSquare size={28} className="mx-auto mb-2 opacity-30" />
             No messages yet
           </div>
         ) : conversations.map(c => (
           <button
             key={c.phone_number}
-            className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${selected?.phone_number === c.phone_number ? 'bg-violet-50 border-l-2 border-l-violet-500' : ''}`}
+            className={`w-full text-left px-4 py-3 border-b border-zinc-800 hover:bg-zinc-800 transition-colors ${selected?.phone_number === c.phone_number ? 'bg-emerald-50 border-l-2 border-l-emerald-500' : ''}`}
             onClick={() => openConversation(c)}
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
-                <Phone size={14} className="text-violet-600" />
+              <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <Phone size={14} className="text-emerald-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-gray-900 truncate">{c.phone_number}</p>
-                <p className="text-xs text-gray-400 truncate">{c.last_message}</p>
-                <p className="text-xs text-gray-300 mt-0.5">{fmtTime(c.last_message_time)}</p>
+                <p className="font-medium text-sm text-zinc-50 truncate">{c.phone_number}</p>
+                <p className="text-xs text-zinc-500 truncate">{c.last_message}</p>
+                <p className="text-xs text-zinc-600 mt-0.5">{fmtTime(c.last_message_time)}</p>
               </div>
-              <span className={`text-xs flex-shrink-0 px-1.5 py-0.5 rounded-full ${c.last_direction === 'incoming' ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-500'}`}>
+              <span className={`text-xs flex-shrink-0 px-1.5 py-0.5 rounded-full ${c.last_direction === 'incoming' ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-800 text-zinc-400'}`}>
                 {c.last_direction === 'incoming' ? 'in' : 'out'}
               </span>
             </div>
@@ -79,38 +79,38 @@ export default function Messages() {
   );
 
   const MessageThread = () => (
-    <div className="flex flex-col h-full bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
+    <div className="flex flex-col h-full bg-zinc-950">
+      <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center gap-3">
         <button
-          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 md:hidden"
+          className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-300 md:hidden"
           onClick={() => setShowThread(false)}
         >
           <ChevronLeft size={20} />
         </button>
-        <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
-          <Phone size={16} className="text-violet-600" />
+        <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+          <Phone size={16} className="text-emerald-600" />
         </div>
         <div>
-          <p className="font-semibold text-gray-900 text-sm">{selected.phone_number}</p>
-          <p className="text-xs text-gray-400">{selected.message_count} messages</p>
+          <p className="font-semibold text-zinc-50 text-sm">{selected.phone_number}</p>
+          <p className="text-xs text-zinc-500">{selected.message_count} messages</p>
         </div>
-        <button className="ml-auto p-1.5 rounded-lg hover:bg-gray-100" onClick={() => fetchMessages(selected.phone_number)}>
-          <RefreshCw size={15} className="text-gray-400" />
+        <button className="ml-auto p-1.5 rounded-lg hover:bg-zinc-800" onClick={() => fetchMessages(selected.phone_number)}>
+          <RefreshCw size={15} className="text-zinc-500" />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {loading ? (
-          <div className="text-center text-gray-400 pt-10">Loading…</div>
+          <div className="text-center text-zinc-500 pt-10">Loading…</div>
         ) : messages.map(m => (
           <div key={m.id} className={`flex ${m.direction === 'outgoing' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
               m.direction === 'outgoing'
-                ? 'bg-violet-600 text-white rounded-br-sm'
-                : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-sm'
+                ? 'bg-emerald-600 text-white rounded-br-sm'
+                : 'bg-zinc-900 text-zinc-100 shadow-sm border border-zinc-800 rounded-bl-sm'
             }`}>
               <p className="whitespace-pre-wrap leading-relaxed">{m.message_text}</p>
-              <p className={`text-xs mt-1 ${m.direction === 'outgoing' ? 'text-violet-200' : 'text-gray-400'}`}>
+              <p className={`text-xs mt-1 ${m.direction === 'outgoing' ? 'text-emerald-200' : 'text-zinc-500'}`}>
                 {fmtTime(m.created_at)}
               </p>
             </div>
@@ -119,8 +119,8 @@ export default function Messages() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="bg-white border-t border-gray-100 px-4 py-3">
-        <p className="text-xs text-gray-400 text-center">
+      <div className="bg-zinc-900 border-t border-zinc-800 px-4 py-3">
+        <p className="text-xs text-zinc-500 text-center">
           Auto-replies sent when Owner is Away. Manual replies via WhatsApp on your phone.
         </p>
       </div>
@@ -136,12 +136,12 @@ export default function Messages() {
 
       {/* Desktop: side by side */}
       <div className="hidden md:flex h-screen overflow-hidden">
-        <div className="w-72 bg-white border-r border-gray-100 flex flex-col">
+        <div className="w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col">
           <ConversationList />
         </div>
-        <div className="flex-1 flex flex-col bg-gray-50">
+        <div className="flex-1 flex flex-col bg-zinc-950">
           {!selected ? (
-            <div className="flex-1 flex items-center justify-center text-center text-gray-400">
+            <div className="flex-1 flex items-center justify-center text-center text-zinc-500">
               <div>
                 <MessageSquare size={48} className="mx-auto mb-3 opacity-20" />
                 <p className="font-medium">Select a conversation</p>
@@ -154,3 +154,4 @@ export default function Messages() {
     </>
   );
 }
+

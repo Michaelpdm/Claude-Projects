@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PinLogin from './pages/PinLogin';
 import Layout from './components/Layout';
@@ -30,11 +30,11 @@ function ManagerOrOwner({ children }) {
 function AccessDenied({ message }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
-      <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mb-4">
-        <Lock size={28} className="text-violet-400" />
+      <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
+        <Lock size={28} className="text-emerald-400" />
       </div>
-      <h2 className="text-lg font-bold text-gray-800 mb-1">Access Restricted</h2>
-      <p className="text-sm text-gray-400 max-w-xs">{message}</p>
+      <h2 className="text-lg font-bold text-zinc-100 mb-1">Access Restricted</h2>
+      <p className="text-sm text-zinc-500 max-w-xs">{message}</p>
     </div>
   );
 }
@@ -73,3 +73,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

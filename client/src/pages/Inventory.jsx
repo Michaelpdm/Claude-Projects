@@ -94,8 +94,8 @@ export default function Inventory() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-sm text-gray-500">{products.length} products</p>
+          <h1 className="text-xl md:text-2xl font-bold text-zinc-50">Inventory</h1>
+          <p className="text-sm text-zinc-400">{products.length} products</p>
         </div>
         <button className="btn-primary text-xs md:text-sm px-3 md:px-4" onClick={openAdd}><Plus size={14} /> Add Product</button>
       </div>
@@ -103,7 +103,7 @@ export default function Inventory() {
       {/* Filters */}
       <div className="card mb-4 md:mb-6 flex flex-col sm:flex-row flex-wrap gap-3">
         <div className="flex-1 min-w-0 relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input className="input pl-9" placeholder="Search products…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <select className="input w-40" value={filterCat} onChange={e => setFilterCat(e.target.value)}>
@@ -122,36 +122,36 @@ export default function Inventory() {
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {products.length === 0 ? (
-          <div className="card text-center py-12 text-gray-400">
+          <div className="card text-center py-12 text-zinc-500">
             <Package size={32} className="mx-auto mb-2 opacity-30" />No products found
           </div>
         ) : products.map(p => (
-          <div key={p.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+          <div key={p.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-sm">
             <div className="flex items-start gap-3">
               {p.image_url
-                ? <img src={p.image_url} alt={p.name} className="w-14 h-14 rounded-xl object-cover border border-gray-200 flex-shrink-0" />
-                : <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0"><Package size={20} className="text-gray-400" /></div>
+                ? <img src={p.image_url} alt={p.name} className="w-14 h-14 rounded-xl object-cover border border-zinc-700 flex-shrink-0" />
+                : <div className="w-14 h-14 rounded-xl bg-zinc-800 flex items-center justify-center flex-shrink-0"><Package size={20} className="text-zinc-500" /></div>
               }
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold text-gray-900 text-sm leading-tight">{p.name}</p>
+                  <p className="font-semibold text-zinc-50 text-sm leading-tight">{p.name}</p>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className={`font-bold text-sm ${p.stock_quantity < LOW_STOCK ? 'text-red-600' : 'text-gray-900'}`}>{p.stock_quantity}</span>
+                    <span className={`font-bold text-sm ${p.stock_quantity < LOW_STOCK ? 'text-red-600' : 'text-zinc-50'}`}>{p.stock_quantity}</span>
                     {p.stock_quantity < LOW_STOCK && <AlertTriangle size={12} className="text-amber-500" />}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-1">
-                  {p.category && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{p.category}</span>}
-                  {p.size && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{p.size}</span>}
-                  {p.color && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{p.color}</span>}
+                  {p.category && <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full">{p.category}</span>}
+                  {p.size && <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full">{p.size}</span>}
+                  {p.color && <span className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full">{p.color}</span>}
                 </div>
-                <p className="text-sm font-bold text-violet-700 mt-1">₦{Number(p.price).toLocaleString()}</p>
+                <p className="text-sm font-bold text-emerald-700 mt-1">₦{Number(p.price).toLocaleString()}</p>
               </div>
             </div>
-            <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
-              <button className="flex-1 bg-violet-600 text-white text-sm font-medium py-2 rounded-xl" onClick={() => setRestockProduct(p)}>+ Restock</button>
-              <button className="p-2 rounded-xl border border-gray-200 text-violet-600" onClick={() => openEdit(p)}><Edit2 size={16} /></button>
-              <button className="p-2 rounded-xl border border-gray-200 text-red-400" onClick={() => handleDelete(p.id)}><Trash2 size={16} /></button>
+            <div className="flex gap-2 mt-3 pt-3 border-t border-zinc-800">
+              <button className="flex-1 bg-emerald-600 text-white text-sm font-medium py-2 rounded-xl" onClick={() => setRestockProduct(p)}>+ Restock</button>
+              <button className="p-2 rounded-xl border border-zinc-700 text-emerald-600" onClick={() => openEdit(p)}><Edit2 size={16} /></button>
+              <button className="p-2 rounded-xl border border-zinc-700 text-red-400" onClick={() => handleDelete(p.id)}><Trash2 size={16} /></button>
             </div>
           </div>
         ))}
@@ -161,7 +161,7 @@ export default function Inventory() {
       <div className="hidden md:block card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-zinc-950 border-b border-zinc-800">
               <tr>
                 <th className="table-th">Product</th>
                 <th className="table-th">Category</th>
@@ -173,30 +173,30 @@ export default function Inventory() {
                 <th className="table-th">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-zinc-800">
               {products.length === 0 ? (
-                <tr><td colSpan={8} className="table-td text-center text-gray-400 py-12">
+                <tr><td colSpan={8} className="table-td text-center text-zinc-500 py-12">
                   <Package size={32} className="mx-auto mb-2 opacity-30" />No products found
                 </td></tr>
               ) : products.map(p => (
-                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={p.id} className="hover:bg-zinc-800 transition-colors">
                   <td className="table-td">
                     <div className="flex items-center gap-3">
                       {p.image_url
-                        ? <img src={p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
-                        : <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center"><Package size={16} className="text-gray-400" /></div>
+                        ? <img src={p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-zinc-700" />
+                        : <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center"><Package size={16} className="text-zinc-500" /></div>
                       }
-                      <span className="font-medium text-gray-900">{p.name}</span>
+                      <span className="font-medium text-zinc-50">{p.name}</span>
                     </div>
                   </td>
                   <td className="table-td"><span className="badge-gray">{p.category || '—'}</span></td>
                   <td className="table-td">{p.size || '—'}</td>
                   <td className="table-td">{p.color || '—'}</td>
                   <td className="table-td font-medium">₦{Number(p.price).toLocaleString()}</td>
-                  <td className="table-td text-gray-500">₦{Number(p.cost || 0).toLocaleString()}</td>
+                  <td className="table-td text-zinc-400">₦{Number(p.cost || 0).toLocaleString()}</td>
                   <td className="table-td">
                     <div className="flex items-center gap-2">
-                      <span className={`font-semibold ${p.stock_quantity < LOW_STOCK ? 'text-red-600' : 'text-gray-900'}`}>
+                      <span className={`font-semibold ${p.stock_quantity < LOW_STOCK ? 'text-red-600' : 'text-zinc-50'}`}>
                         {p.stock_quantity}
                       </span>
                       {p.stock_quantity < LOW_STOCK && (
@@ -209,7 +209,7 @@ export default function Inventory() {
                   <td className="table-td">
                     <div className="flex items-center gap-1">
                       <button className="btn-secondary text-xs py-1 px-2" onClick={() => setRestockProduct(p)}>Restock</button>
-                      <button className="p-1.5 rounded-lg hover:bg-violet-50 text-violet-600" onClick={() => openEdit(p)}><Edit2 size={14} /></button>
+                      <button className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600" onClick={() => openEdit(p)}><Edit2 size={14} /></button>
                       <button className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" onClick={() => handleDelete(p.id)}><Trash2 size={14} /></button>
                     </div>
                   </td>
@@ -223,22 +223,22 @@ export default function Inventory() {
       {/* Add/Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-zinc-900 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-lg font-semibold">{editProduct ? 'Edit Product' : 'Add Product'}</h2>
-              <button onClick={() => setShowForm(false)}><X size={20} className="text-gray-400 hover:text-gray-600" /></button>
+              <button onClick={() => setShowForm(false)}><X size={20} className="text-zinc-500 hover:text-zinc-300" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {/* Image upload */}
               <div>
                 <label className="label">Product Image</label>
                 <div
-                  className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-violet-400 transition-colors"
+                  className="border-2 border-dashed border-zinc-700 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-400 transition-colors"
                   onClick={() => fileRef.current.click()}
                 >
                   {preview
                     ? <img src={preview} alt="preview" className="h-32 mx-auto rounded-lg object-contain" />
-                    : <div className="py-4"><Upload size={24} className="mx-auto text-gray-400 mb-1" /><p className="text-sm text-gray-500">Click to upload image</p></div>
+                    : <div className="py-4"><Upload size={24} className="mx-auto text-zinc-500 mb-1" /><p className="text-sm text-zinc-400">Click to upload image</p></div>
                   }
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                 </div>
@@ -289,9 +289,9 @@ export default function Inventory() {
       {/* Restock Modal */}
       {restockProduct && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+          <div className="bg-zinc-900 rounded-2xl shadow-xl w-full max-w-sm p-6">
             <h2 className="text-lg font-semibold mb-1">Restock</h2>
-            <p className="text-sm text-gray-500 mb-4">Adding stock to <strong>{restockProduct.name}</strong> (current: {restockProduct.stock_quantity})</p>
+            <p className="text-sm text-zinc-400 mb-4">Adding stock to <strong>{restockProduct.name}</strong> (current: {restockProduct.stock_quantity})</p>
             <label className="label">Quantity to add</label>
             <input className="input mb-4" type="number" min="1" value={restockQty} onChange={e => setRestockQty(e.target.value)} autoFocus />
             <div className="flex gap-3">
@@ -304,3 +304,4 @@ export default function Inventory() {
     </div>
   );
 }
+

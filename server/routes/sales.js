@@ -96,6 +96,25 @@ router.post('/bulk', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Returns sale count per hour-of-day for the past 7 days (0-23)
+router.get('/peak-hours', async (req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT EXTRACT(HOUR FROM created_at AT TIME ZONE 'Africa/Lagos')::int AS hour,
+             COUNT(*) AS count
+      FROM sales
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+      GROUP BY hour
+      ORDER BY hour
+    `);
+    // Fill all 24 hours, defaulting to 0
+    const map = {};
+    rows.forEach(r => { map[r.hour] = parseInt(r.count); });
+    const result = Array.from({ length: 24 }, (_, h) => ({ hour: h, count: map[h] || 0 }));
+    res.json(result);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.delete('/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM sales WHERE id = $1', [req.params.id]);

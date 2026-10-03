@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Briefcase, User, Delete, ArrowLeft } from 'lucide-react';
 import { apiFetch } from '../utils/api';
@@ -101,21 +101,21 @@ export default function PinLogin() {
 
   if (!settings) {
     return (
-      <div className="min-h-screen bg-violet-700 flex items-center justify-center">
+      <div className="min-h-screen bg-emerald-700 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-700 to-purple-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-700 to-purple-900 flex flex-col items-center justify-center p-6">
       {/* Store name */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+        <div className="w-16 h-16 bg-zinc-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
           <ShieldCheck size={32} className="text-white" />
         </div>
         <h1 className="text-2xl font-bold text-white">{storeName}</h1>
-        <p className="text-violet-200 text-sm mt-1">Who is signing in?</p>
+        <p className="text-emerald-200 text-sm mt-1">Who is signing in?</p>
       </div>
 
       {!selectedRole ? (
@@ -127,17 +127,17 @@ export default function PinLogin() {
               onClick={() => handleRoleSelect(key)}
               className={`w-full rounded-2xl p-4 flex items-center gap-4 active:scale-95 transition-transform ${
                 dark
-                  ? 'bg-white shadow-lg'
-                  : 'bg-white/15 border border-white/30 backdrop-blur-sm'
+                  ? 'bg-zinc-900 shadow-lg'
+                  : 'bg-zinc-900/15 border border-white/30 backdrop-blur-sm'
               }`}
             >
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                dark ? 'bg-violet-100' : 'bg-white/20'
+                dark ? 'bg-emerald-100' : 'bg-zinc-900/20'
               }`}>
-                <Icon size={22} className={dark ? 'text-violet-600' : 'text-white'} />
+                <Icon size={22} className={dark ? 'text-emerald-600' : 'text-white'} />
               </div>
               <div className="text-left">
-                <p className={`font-bold ${dark ? 'text-gray-900' : 'text-white'}`}>{label}</p>
+                <p className={`font-bold ${dark ? 'text-zinc-50' : 'text-white'}`}>{label}</p>
               </div>
             </button>
           ))}
@@ -147,13 +147,13 @@ export default function PinLogin() {
         <div className="w-full max-w-xs">
           <button
             onClick={() => setSelectedRole(null)}
-            className="flex items-center gap-1.5 text-violet-200 text-sm mb-8"
+            className="flex items-center gap-1.5 text-emerald-200 text-sm mb-8"
           >
             <ArrowLeft size={16} /> Back
           </button>
 
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 bg-zinc-900/20 rounded-xl flex items-center justify-center mx-auto mb-3">
               {selectedRoleDef && <selectedRoleDef.icon size={24} className="text-white" />}
             </div>
             <p className="text-white font-semibold text-lg">{selectedRoleDef?.label} PIN</p>
@@ -164,7 +164,7 @@ export default function PinLogin() {
           <div className="flex justify-center gap-4 mb-10">
             {[0, 1, 2, 3].map(i => (
               <div key={i} className={`w-4 h-4 rounded-full transition-all ${
-                i < pin.length ? 'bg-white scale-110' : 'bg-white/30'
+                i < pin.length ? 'bg-zinc-900 scale-110' : 'bg-zinc-900/30'
               }`} />
             ))}
           </div>
@@ -175,7 +175,7 @@ export default function PinLogin() {
               <button
                 key={n}
                 onClick={() => handleKey(String(n))}
-                className="bg-white/15 border border-white/20 rounded-2xl h-16 text-white text-xl font-semibold active:bg-white/30 transition-colors"
+                className="bg-zinc-900/15 border border-white/20 rounded-2xl h-16 text-white text-xl font-semibold active:bg-zinc-900/30 transition-colors"
               >
                 {n}
               </button>
@@ -183,13 +183,13 @@ export default function PinLogin() {
             <div />
             <button
               onClick={() => handleKey('0')}
-              className="bg-white/15 border border-white/20 rounded-2xl h-16 text-white text-xl font-semibold active:bg-white/30 transition-colors"
+              className="bg-zinc-900/15 border border-white/20 rounded-2xl h-16 text-white text-xl font-semibold active:bg-zinc-900/30 transition-colors"
             >
               0
             </button>
             <button
               onClick={handleBackspace}
-              className="bg-white/15 border border-white/20 rounded-2xl h-16 flex items-center justify-center active:bg-white/30 transition-colors"
+              className="bg-zinc-900/15 border border-white/20 rounded-2xl h-16 flex items-center justify-center active:bg-zinc-900/30 transition-colors"
             >
               <Delete size={20} className="text-white" />
             </button>
@@ -199,3 +199,4 @@ export default function PinLogin() {
     </div>
   );
 }
+

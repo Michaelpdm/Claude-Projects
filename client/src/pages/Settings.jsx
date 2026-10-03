@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Save, Wifi, WifiOff, RefreshCw, LogOut, ShieldCheck, Eye, EyeOff, Key, AlertTriangle } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
@@ -112,25 +112,25 @@ export default function Settings() {
   const statusInfo = {
     connected: { label: 'Connected', color: 'text-emerald-600', bg: 'bg-emerald-50', icon: Wifi },
     qr_pending: { label: 'Waiting for QR scan...', color: 'text-amber-600', bg: 'bg-amber-50', icon: RefreshCw },
-    disconnected: { label: 'Disconnected', color: 'text-gray-500', bg: 'bg-gray-50', icon: WifiOff },
+    disconnected: { label: 'Disconnected', color: 'text-zinc-400', bg: 'bg-zinc-950', icon: WifiOff },
     error: { label: 'Error — restart server', color: 'text-red-600', bg: 'bg-red-50', icon: WifiOff },
-  }[waStatus] || { label: waStatus, color: 'text-gray-500', bg: 'bg-gray-50', icon: WifiOff };
+  }[waStatus] || { label: waStatus, color: 'text-zinc-400', bg: 'bg-zinc-950', icon: WifiOff };
 
   const StatusIcon = statusInfo.icon;
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+      <h1 className="text-2xl font-bold text-zinc-50">Settings</h1>
 
       {/* ── HANDOVER TO CLIENT ── */}
-      <div className="card border-2 border-violet-100 space-y-4">
+      <div className="card border-2 border-emerald-100 space-y-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
-            <Key size={16} className="text-violet-600" />
+          <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <Key size={16} className="text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-gray-900">Client Handover</h2>
-            <p className="text-xs text-gray-400">Set PINs before giving the app to a client</p>
+            <h2 className="text-base font-semibold text-zinc-50">Client Handover</h2>
+            <p className="text-xs text-zinc-500">Set PINs before giving the app to a client</p>
           </div>
         </div>
 
@@ -140,15 +140,15 @@ export default function Settings() {
             { role: 'manager', label: 'Manager PIN', desc: 'Sales, stock, customers & reports', pinKey: 'manager_pin', style: 'btn-secondary' },
             { role: 'staff', label: 'Staff PIN', desc: 'Sales and stock only', pinKey: 'staff_pin', style: 'btn-secondary' },
           ].map(({ role, label, desc, pinKey, style }) => (
-            <div key={role} className="rounded-xl border border-gray-100 p-4 flex items-center justify-between gap-4">
+            <div key={role} className="rounded-xl border border-zinc-800 p-4 flex items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-gray-800">{label}</p>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${settings[pinKey] ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                  <p className="text-sm font-semibold text-zinc-100">{label}</p>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${settings[pinKey] ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-800 text-zinc-500'}`}>
                     {settings[pinKey] ? 'Set' : 'Not set'}
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">{desc}</p>
               </div>
               <button onClick={() => openPinModal(role)} className={`${style} text-sm py-2 px-3 whitespace-nowrap flex-shrink-0`}>
                 <Key size={13} /> {settings[pinKey] ? 'Change' : 'Set PIN'}
@@ -167,7 +167,7 @@ export default function Settings() {
 
       {/* ── STORE INFORMATION ── */}
       <div className="card space-y-4">
-        <h2 className="text-base font-semibold text-gray-900">Store Information</h2>
+        <h2 className="text-base font-semibold text-zinc-50">Store Information</h2>
         {[
           { key: 'store_name', label: 'Store Name', placeholder: 'My Clothing Store' },
           { key: 'store_phone', label: 'Store Phone', placeholder: '+234...' },
@@ -220,8 +220,8 @@ export default function Settings() {
 
       {/* ── OWNER AVAILABILITY ── */}
       <div className="card">
-        <h2 className="text-base font-semibold text-gray-900 mb-1">Owner Availability</h2>
-        <p className="text-sm text-gray-500 mb-4">
+        <h2 className="text-base font-semibold text-zinc-50 mb-1">Owner Availability</h2>
+        <p className="text-sm text-zinc-400 mb-4">
           When set to Away, incoming WhatsApp messages will receive an automatic reply listing your in-stock products.
         </p>
         <button
@@ -239,15 +239,15 @@ export default function Settings() {
             </p>
           </div>
           <div className={`w-14 h-8 rounded-full transition-colors ml-4 flex-shrink-0 ${isAvailable ? 'bg-emerald-500' : 'bg-amber-400'}`}>
-            <div className={`w-6 h-6 bg-white rounded-full mt-1 transition-transform shadow ${isAvailable ? 'translate-x-7' : 'translate-x-1'}`} />
+            <div className={`w-6 h-6 bg-zinc-900 rounded-full mt-1 transition-transform shadow ${isAvailable ? 'translate-x-7' : 'translate-x-1'}`} />
           </div>
         </button>
       </div>
 
       {/* ── WHATSAPP ── */}
       <div className="card">
-        <h2 className="text-base font-semibold text-gray-900 mb-1">WhatsApp Integration</h2>
-        <p className="text-sm text-gray-500 mb-4">
+        <h2 className="text-base font-semibold text-zinc-50 mb-1">WhatsApp Integration</h2>
+        <p className="text-sm text-zinc-400 mb-4">
           Connect WhatsApp to enable the auto-responder. Open WhatsApp → Linked Devices → Link a Device, then scan the QR code.
         </p>
 
@@ -261,16 +261,16 @@ export default function Settings() {
         {waStatus === 'qr_pending' && (
           <div className="mb-5">
             {qrLoading ? (
-              <div className="h-56 flex flex-col items-center justify-center bg-gray-50 rounded-2xl gap-3">
-                <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-gray-400">Generating QR code...</p>
+              <div className="h-56 flex flex-col items-center justify-center bg-zinc-950 rounded-2xl gap-3">
+                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-zinc-500">Generating QR code...</p>
               </div>
             ) : qrCode ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="p-3 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                <div className="p-3 bg-zinc-900 rounded-2xl border border-zinc-700 shadow-sm">
                   <img src={qrCode} alt="WhatsApp QR Code" className="w-56 h-56 rounded-lg" />
                 </div>
-                <p className="text-xs text-gray-400 text-center">Scan with WhatsApp · expires after 60 seconds</p>
+                <p className="text-xs text-zinc-500 text-center">Scan with WhatsApp · expires after 60 seconds</p>
                 <button className="btn-secondary w-full" onClick={loadQr}>
                   <RefreshCw size={15} /> Refresh QR Code
                 </button>
@@ -300,12 +300,12 @@ export default function Settings() {
       {/* ── CHANGE PIN MODAL ── */}
       {pinModal && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">
+          <div className="bg-zinc-900 rounded-2xl shadow-xl w-full max-w-sm">
+            <div className="p-6 border-b border-zinc-800">
+              <h2 className="text-lg font-bold text-zinc-50">
                 {pinModal === 'owner' ? 'Owner PIN' : pinModal === 'manager' ? 'Manager PIN' : 'Staff PIN'}
               </h2>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-zinc-500 mt-1">
                 {pinModal === 'owner' ? 'Full access — reports, finances, all settings' : pinModal === 'manager' ? 'Sales, stock, customers & reports' : 'Sales and stock access only'}
               </p>
             </div>
@@ -324,7 +324,7 @@ export default function Settings() {
                     onChange={e => { setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4)); setPinError(''); }}
                     autoFocus
                   />
-                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500"
                     onClick={() => setShowNew(p => !p)}>
                     {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -343,14 +343,14 @@ export default function Settings() {
                     value={confirmPin}
                     onChange={e => { setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4)); setPinError(''); }}
                   />
-                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500"
                     onClick={() => setShowConfirm(p => !p)}>
                     {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
               {pinError && <p className="text-sm text-red-500">{pinError}</p>}
-              <p className="text-xs text-gray-400">Leave both fields empty to remove the PIN for this role.</p>
+              <p className="text-xs text-zinc-500">Leave both fields empty to remove the PIN for this role.</p>
             </div>
             <div className="flex gap-3 p-6 pt-0">
               <button className="btn-secondary flex-1" onClick={() => setPinModal(null)}>Cancel</button>
@@ -368,3 +368,4 @@ export default function Settings() {
     </div>
   );
 }
+

@@ -89,8 +89,8 @@ export default function Invoices() {
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Invoices</h1>
-          <p className="text-sm text-gray-500">{invoices.length} invoices</p>
+          <h1 className="text-xl md:text-2xl font-bold text-zinc-50">Invoices</h1>
+          <p className="text-sm text-zinc-400">{invoices.length} invoices</p>
         </div>
         <button className="btn-primary text-xs md:text-sm px-3 md:px-4" onClick={() => setShowForm(true)}>
           <Plus size={14} /> New Invoice
@@ -101,7 +101,7 @@ export default function Invoices() {
       {viewInvoice && (
         <div className="md:hidden">
           <div className="flex items-center justify-between mb-4">
-            <button onClick={() => setViewInvoice(null)} className="flex items-center gap-1 text-violet-600 text-sm font-medium">
+            <button onClick={() => setViewInvoice(null)} className="flex items-center gap-1 text-emerald-600 text-sm font-medium">
               ← Back to invoices
             </button>
             <div className="flex items-center gap-2">
@@ -115,29 +115,29 @@ export default function Invoices() {
           </div>
           <div className="card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-900">Invoice #{viewInvoice.id}</h2>
+              <h2 className="font-semibold text-zinc-50">Invoice #{viewInvoice.id}</h2>
               <select className="input w-28 text-xs" value={viewInvoice.status} onChange={e => updateStatus(viewInvoice.id, e.target.value)}>
                 {STATUSES.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
-            <div className="border-b border-gray-100 pb-4 mb-4">
-              <p className="text-sm text-gray-500">Bill To</p>
-              <p className="font-semibold text-gray-900">{viewInvoice.customer_name}</p>
-              <p className="text-xs text-gray-400">{viewInvoice.created_at?.slice(0, 10)}</p>
+            <div className="border-b border-zinc-800 pb-4 mb-4">
+              <p className="text-sm text-zinc-400">Bill To</p>
+              <p className="font-semibold text-zinc-50">{viewInvoice.customer_name}</p>
+              <p className="text-xs text-zinc-500">{viewInvoice.created_at?.slice(0, 10)}</p>
             </div>
             <div className="space-y-2 mb-4">
               {(typeof viewInvoice.items === 'string' ? JSON.parse(viewInvoice.items) : viewInvoice.items).map((it, i) => (
-                <div key={i} className="flex justify-between items-start py-2 border-b border-gray-50">
+                <div key={i} className="flex justify-between items-start py-2 border-b border-zinc-800">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{it.description}</p>
-                    <p className="text-xs text-gray-400">x{it.quantity} @ {fmt(it.unit_price)}</p>
+                    <p className="text-sm font-medium text-zinc-50">{it.description}</p>
+                    <p className="text-xs text-zinc-500">x{it.quantity} @ {fmt(it.unit_price)}</p>
                   </div>
-                  <p className="font-semibold text-sm text-gray-900">{fmt(it.subtotal)}</p>
+                  <p className="font-semibold text-sm text-zinc-50">{fmt(it.subtotal)}</p>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-              <span className="font-semibold text-gray-700">Total</span>
+            <div className="flex justify-between items-center pt-2 border-t border-zinc-700">
+              <span className="font-semibold text-zinc-200">Total</span>
               <p className="text-2xl font-bold">{fmt(viewInvoice.total)}</p>
             </div>
           </div>
@@ -148,18 +148,18 @@ export default function Invoices() {
       {!viewInvoice && (
         <div className="md:hidden space-y-3">
           {invoices.length === 0 ? (
-            <div className="text-center py-12 text-gray-400 text-sm">
+            <div className="text-center py-12 text-zinc-500 text-sm">
               <FileText size={28} className="mx-auto mb-2 opacity-30" />No invoices yet
             </div>
           ) : invoices.map(inv => (
             <button key={inv.id} onClick={() => setViewInvoice(inv)}
-              className="w-full bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center justify-between shadow-sm text-left">
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3.5 flex items-center justify-between shadow-sm text-left">
               <div>
-                <p className="font-semibold text-gray-900">{inv.customer_name}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{inv.created_at?.slice(0, 10)}</p>
+                <p className="font-semibold text-zinc-50">{inv.customer_name}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">{inv.created_at?.slice(0, 10)}</p>
               </div>
               <div className="text-right">
-                <p className="font-bold text-gray-900">{fmt(inv.total)}</p>
+                <p className="font-bold text-zinc-50">{fmt(inv.total)}</p>
                 <span className={`text-xs mt-1 inline-block ${statusColor(inv.status)}`}>{inv.status}</span>
               </div>
             </button>
@@ -172,7 +172,7 @@ export default function Invoices() {
         <div className="card overflow-hidden p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-zinc-950 border-b border-zinc-800">
                 <tr>
                   <th className="table-th">Customer</th>
                   <th className="table-th">Total</th>
@@ -180,21 +180,21 @@ export default function Invoices() {
                   <th className="table-th">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-zinc-800">
                 {invoices.length === 0 ? (
-                  <tr><td colSpan={4} className="table-td text-center text-gray-400 py-10">
+                  <tr><td colSpan={4} className="table-td text-center text-zinc-500 py-10">
                     <FileText size={28} className="mx-auto mb-2 opacity-30" />No invoices yet
                   </td></tr>
                 ) : invoices.map(inv => (
-                  <tr key={inv.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setViewInvoice(inv)}>
+                  <tr key={inv.id} className="hover:bg-zinc-800 cursor-pointer" onClick={() => setViewInvoice(inv)}>
                     <td className="table-td">
-                      <p className="font-medium text-gray-900">{inv.customer_name}</p>
-                      <p className="text-xs text-gray-400">{inv.created_at?.slice(0, 10)}</p>
+                      <p className="font-medium text-zinc-50">{inv.customer_name}</p>
+                      <p className="text-xs text-zinc-500">{inv.created_at?.slice(0, 10)}</p>
                     </td>
                     <td className="table-td font-semibold">{fmt(inv.total)}</td>
                     <td className="table-td"><span className={statusColor(inv.status)}>{inv.status}</span></td>
                     <td className="table-td">
-                      <button className="p-1.5 rounded-lg hover:bg-violet-50 text-violet-600" onClick={e => { e.stopPropagation(); setViewInvoice(inv); }}>
+                      <button className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600" onClick={e => { e.stopPropagation(); setViewInvoice(inv); }}>
                         <Eye size={14} />
                       </button>
                     </td>
@@ -208,7 +208,7 @@ export default function Invoices() {
         {viewInvoice ? (
           <div className="card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-900">Invoice #{viewInvoice.id}</h2>
+              <h2 className="font-semibold text-zinc-50">Invoice #{viewInvoice.id}</h2>
               <div className="flex items-center gap-2">
                 <select className="input w-28 text-xs" value={viewInvoice.status} onChange={e => updateStatus(viewInvoice.id, e.target.value)}>
                   {STATUSES.map(s => <option key={s}>{s}</option>)}
@@ -221,23 +221,23 @@ export default function Invoices() {
                 </button>
               </div>
             </div>
-            <div className="border-b border-gray-100 pb-4 mb-4">
-              <p className="text-sm text-gray-500">Bill To</p>
-              <p className="font-semibold text-gray-900">{viewInvoice.customer_name}</p>
-              <p className="text-xs text-gray-400">{viewInvoice.created_at?.slice(0, 10)}</p>
+            <div className="border-b border-zinc-800 pb-4 mb-4">
+              <p className="text-sm text-zinc-400">Bill To</p>
+              <p className="font-semibold text-zinc-50">{viewInvoice.customer_name}</p>
+              <p className="text-xs text-zinc-500">{viewInvoice.created_at?.slice(0, 10)}</p>
             </div>
             <table className="w-full mb-4 text-sm">
               <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="py-2 text-left text-xs text-gray-500 font-semibold">Item</th>
-                  <th className="py-2 text-right text-xs text-gray-500 font-semibold">Qty</th>
-                  <th className="py-2 text-right text-xs text-gray-500 font-semibold">Price</th>
-                  <th className="py-2 text-right text-xs text-gray-500 font-semibold">Total</th>
+                <tr className="border-b border-zinc-800">
+                  <th className="py-2 text-left text-xs text-zinc-400 font-semibold">Item</th>
+                  <th className="py-2 text-right text-xs text-zinc-400 font-semibold">Qty</th>
+                  <th className="py-2 text-right text-xs text-zinc-400 font-semibold">Price</th>
+                  <th className="py-2 text-right text-xs text-zinc-400 font-semibold">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {(typeof viewInvoice.items === 'string' ? JSON.parse(viewInvoice.items) : viewInvoice.items).map((it, i) => (
-                  <tr key={i} className="border-b border-gray-50">
+                  <tr key={i} className="border-b border-zinc-800">
                     <td className="py-2">{it.description}</td>
                     <td className="py-2 text-right">{it.quantity}</td>
                     <td className="py-2 text-right">{fmt(it.unit_price)}</td>
@@ -246,13 +246,13 @@ export default function Invoices() {
                 ))}
               </tbody>
             </table>
-            <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-              <span className="font-semibold text-gray-700">Total</span>
+            <div className="flex justify-between items-center pt-2 border-t border-zinc-700">
+              <span className="font-semibold text-zinc-200">Total</span>
               <p className="text-2xl font-bold">{fmt(viewInvoice.total)}</p>
             </div>
           </div>
         ) : (
-          <div className="card flex items-center justify-center text-gray-400 min-h-48">
+          <div className="card flex items-center justify-center text-zinc-500 min-h-48">
             <div className="text-center">
               <FileText size={32} className="mx-auto mb-2 opacity-30" />
               <p className="text-sm">Click an invoice to view</p>
@@ -264,10 +264,10 @@ export default function Invoices() {
       {/* Create Invoice Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-4">
+          <div className="bg-zinc-900 rounded-2xl shadow-xl w-full max-w-2xl my-4">
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-lg font-semibold">New Invoice</h2>
-              <button onClick={() => setShowForm(false)}><X size={20} className="text-gray-400 hover:text-gray-600" /></button>
+              <button onClick={() => setShowForm(false)}><X size={20} className="text-zinc-500 hover:text-zinc-300" /></button>
             </div>
             <div className="p-6">
               <div className="mb-4">
@@ -283,9 +283,9 @@ export default function Invoices() {
                 </div>
                 <div className="space-y-4">
                   {form.items.map((it, i) => (
-                    <div key={i} className="bg-gray-50 rounded-xl p-3 space-y-2">
+                    <div key={i} className="bg-zinc-950 rounded-xl p-3 space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-medium text-gray-500">Item {i + 1}</p>
+                        <p className="text-xs font-medium text-zinc-400">Item {i + 1}</p>
                         {form.items.length > 1 && (
                           <button type="button" className="text-red-400 p-1" onClick={() => removeLine(i)}>
                             <X size={14} />
@@ -302,18 +302,18 @@ export default function Invoices() {
                       <datalist id={`products-${i}`}>{products.map(p => <option key={p.id} value={p.name} />)}</datalist>
                       <div className="grid grid-cols-3 gap-2">
                         <div>
-                          <p className="text-xs text-gray-400 mb-1">Qty</p>
+                          <p className="text-xs text-zinc-500 mb-1">Qty</p>
                           <input className="input text-sm" type="number" min="1" value={it.quantity}
                             onChange={e => updateLine(i, 'quantity', e.target.value)} />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400 mb-1">Unit Price (₦)</p>
+                          <p className="text-xs text-zinc-500 mb-1">Unit Price (₦)</p>
                           <input className="input text-sm" type="number" min="0" value={it.unit_price}
                             onChange={e => updateLine(i, 'unit_price', e.target.value)} />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400 mb-1">Subtotal</p>
-                          <p className="text-sm font-semibold text-gray-900 py-2">{fmt(it.subtotal || 0)}</p>
+                          <p className="text-xs text-zinc-500 mb-1">Subtotal</p>
+                          <p className="text-sm font-semibold text-zinc-50 py-2">{fmt(it.subtotal || 0)}</p>
                         </div>
                       </div>
                     </div>
@@ -324,9 +324,9 @@ export default function Invoices() {
                 </button>
               </div>
 
-              <div className="flex justify-between items-center py-3 border-t border-gray-100 mb-4">
+              <div className="flex justify-between items-center py-3 border-t border-zinc-800 mb-4">
                 <span>Total</span>
-                <span className="text-xl font-bold text-violet-600">{fmt(total)}</span>
+                <span className="text-xl font-bold text-emerald-600">{fmt(total)}</span>
               </div>
 
               <form onSubmit={handleCreate}>
@@ -344,3 +344,4 @@ export default function Invoices() {
     </div>
   );
 }
+

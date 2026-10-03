@@ -46,7 +46,7 @@ export default function Expenses() {
   };
 
   const catColor = (cat) => {
-    const map = { 'Stock Purchase': 'bg-blue-50 text-blue-700', 'Rent': 'bg-red-50 text-red-700', 'Transport': 'bg-amber-50 text-amber-700', 'Salary': 'bg-purple-50 text-purple-700', 'Utilities': 'bg-orange-50 text-orange-700', 'Marketing': 'bg-pink-50 text-pink-700', 'General': 'bg-gray-100 text-gray-600' };
+    const map = { 'Stock Purchase': 'bg-blue-50 text-blue-700', 'Rent': 'bg-red-50 text-red-700', 'Transport': 'bg-amber-50 text-amber-700', 'Salary': 'bg-purple-50 text-purple-700', 'Utilities': 'bg-orange-50 text-orange-700', 'Marketing': 'bg-pink-50 text-pink-700', 'General': 'bg-zinc-800 text-zinc-300' };
     return map[cat] || map['General'];
   };
 
@@ -54,8 +54,8 @@ export default function Expenses() {
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Expenses</h1>
-          <p className="text-sm text-gray-500">This month: {fmt(summary.thisMonth?.total)}</p>
+          <h1 className="text-xl font-bold text-zinc-50">Expenses</h1>
+          <p className="text-sm text-zinc-400">This month: {fmt(summary.thisMonth?.total)}</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary text-sm px-4"><Plus size={15} /> Add</button>
       </div>
@@ -75,13 +75,13 @@ export default function Expenses() {
 
       {/* By category */}
       {summary.byCategory?.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-5 shadow-sm">
-          <p className="text-xs text-gray-500 font-medium mb-3">BY CATEGORY (this month)</p>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-5 shadow-sm">
+          <p className="text-xs text-zinc-400 font-medium mb-3">BY CATEGORY (this month)</p>
           <div className="space-y-2">
             {summary.byCategory.map(c => (
               <div key={c.category} className="flex items-center justify-between">
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${catColor(c.category)}`}>{c.category}</span>
-                <span className="font-semibold text-sm text-gray-900">{fmt(c.total)}</span>
+                <span className="font-semibold text-sm text-zinc-50">{fmt(c.total)}</span>
               </div>
             ))}
           </div>
@@ -90,24 +90,24 @@ export default function Expenses() {
 
       {/* List */}
       {expenses.length === 0 ? (
-        <div className="text-center py-16 text-gray-300">
+        <div className="text-center py-16 text-zinc-600">
           <TrendingDown size={48} className="mx-auto mb-3" />
           <p className="text-sm">No expenses logged yet</p>
         </div>
       ) : (
         <div className="space-y-2">
           {expenses.map(e => (
-            <div key={e.id} className="bg-white border border-gray-100 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <div key={e.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-gray-900 text-sm truncate">{e.description}</p>
+                  <p className="font-medium text-zinc-50 text-sm truncate">{e.description}</p>
                   <span className={`text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 ${catColor(e.category)}`}>{e.category}</span>
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">{new Date(e.expense_date).toLocaleDateString()}{e.notes ? ` · ${e.notes}` : ''}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">{new Date(e.expense_date).toLocaleDateString()}{e.notes ? ` · ${e.notes}` : ''}</p>
               </div>
               <div className="flex items-center gap-2 ml-2">
                 <p className="font-bold text-red-600 text-sm">{fmt(e.amount)}</p>
-                <button onClick={() => handleDelete(e.id)} className="text-gray-300 hover:text-red-400"><Trash2 size={14} /></button>
+                <button onClick={() => handleDelete(e.id)} className="text-zinc-600 hover:text-red-400"><Trash2 size={14} /></button>
               </div>
             </div>
           ))}
@@ -117,10 +117,10 @@ export default function Expenses() {
       {/* Add form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
-          <div className="bg-white rounded-t-2xl w-full max-w-lg p-6">
+          <div className="bg-zinc-900 rounded-t-2xl w-full max-w-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-lg">Log Expense</h3>
-              <button onClick={() => setShowForm(false)}><X size={20} className="text-gray-400" /></button>
+              <button onClick={() => setShowForm(false)}><X size={20} className="text-zinc-500" /></button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-3">
               <input className="input" placeholder="Description *" required value={form.description}
@@ -145,3 +145,4 @@ export default function Expenses() {
     </div>
   );
 }
+
