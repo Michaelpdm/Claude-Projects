@@ -248,36 +248,51 @@ export default function Settings() {
       <div className="card">
         <h2 className="text-base font-semibold text-gray-900 mb-1">WhatsApp Integration</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Scan the QR code with WhatsApp on your phone (Linked Devices → Link a Device) to connect the auto-responder.
+          Connect WhatsApp to enable the auto-responder. Open WhatsApp → Linked Devices → Link a Device, then scan the QR code.
         </p>
-        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg mb-4 ${statusInfo.bg}`}>
-          <StatusIcon size={16} className={statusInfo.color} />
-          <span className={`text-sm font-medium ${statusInfo.color}`}>{statusInfo.label}</span>
+
+        {/* Status pill */}
+        <div className={`flex items-center gap-2 px-4 py-3 rounded-xl mb-4 ${statusInfo.bg}`}>
+          <StatusIcon size={18} className={statusInfo.color} />
+          <span className={`text-sm font-semibold ${statusInfo.color}`}>{statusInfo.label}</span>
         </div>
+
+        {/* QR code area */}
         {waStatus === 'qr_pending' && (
-          <div className="mb-4">
+          <div className="mb-5">
             {qrLoading ? (
-              <div className="h-48 flex items-center justify-center bg-gray-50 rounded-xl">
+              <div className="h-56 flex flex-col items-center justify-center bg-gray-50 rounded-2xl gap-3">
+                <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
                 <p className="text-sm text-gray-400">Generating QR code...</p>
               </div>
             ) : qrCode ? (
-              <div className="flex flex-col items-center gap-2">
-                <img src={qrCode} alt="WhatsApp QR Code" className="w-48 h-48 rounded-xl border border-gray-200" />
-                <p className="text-xs text-gray-400">QR code expires after 60 seconds — refresh if needed</p>
-                <button className="btn-secondary text-sm" onClick={loadQr}><RefreshCw size={14} /> Refresh QR</button>
+              <div className="flex flex-col items-center gap-3">
+                <div className="p-3 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                  <img src={qrCode} alt="WhatsApp QR Code" className="w-56 h-56 rounded-lg" />
+                </div>
+                <p className="text-xs text-gray-400 text-center">Scan with WhatsApp · expires after 60 seconds</p>
+                <button className="btn-secondary w-full" onClick={loadQr}>
+                  <RefreshCw size={15} /> Refresh QR Code
+                </button>
               </div>
             ) : (
-              <button className="btn-secondary" onClick={loadQr}><RefreshCw size={14} /> Load QR Code</button>
+              <button className="btn-secondary w-full py-3" onClick={loadQr}>
+                <RefreshCw size={15} /> Load QR Code
+              </button>
             )}
           </div>
         )}
-        <div className="flex gap-3">
+
+        {/* Action button */}
+        <div>
           {waStatus === 'disconnected' || waStatus === 'error' ? (
-            <button className="btn-primary" onClick={connectWa}><Wifi size={14} /> Connect WhatsApp</button>
-          ) : waStatus === 'qr_pending' ? (
-            <button className="btn-secondary" onClick={loadQr}><RefreshCw size={14} /> Refresh QR</button>
-          ) : (
-            <button className="btn-danger" onClick={disconnectWa}><LogOut size={14} /> Disconnect</button>
+            <button className="btn-primary w-full py-3 text-base" onClick={connectWa}>
+              <Wifi size={16} /> Connect WhatsApp
+            </button>
+          ) : waStatus === 'qr_pending' ? null : (
+            <button className="btn-danger w-full py-3 text-base" onClick={disconnectWa}>
+              <LogOut size={16} /> Disconnect WhatsApp
+            </button>
           )}
         </div>
       </div>

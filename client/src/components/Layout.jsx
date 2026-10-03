@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
+import MobileHeader from './MobileHeader';
 
 export default function Layout() {
   return (
@@ -10,14 +11,21 @@ export default function Layout() {
         <Sidebar />
       </div>
 
-      {/* Main content — add bottom padding on mobile for nav bar */}
-      <main className="flex-1 overflow-auto pb-20 md:pb-0">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        {/* Mobile header with back button */}
+        <div className="md:hidden">
+          <MobileHeader />
+        </div>
 
-      {/* Bottom nav — visible on mobile only */}
-      <div className="md:hidden">
-        <BottomNav />
+        {/* Main content */}
+        <main className="flex-1 overflow-auto pb-20 md:pb-0">
+          <Outlet />
+        </main>
+
+        {/* Bottom nav — visible on mobile only */}
+        <div className="md:hidden">
+          <BottomNav />
+        </div>
       </div>
     </div>
   );
