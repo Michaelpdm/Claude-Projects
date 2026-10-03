@@ -2,8 +2,17 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../database');
 const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 
 const PIN_KEYS = ['owner_pin', 'manager_pin', 'staff_pin'];
+
+const pinLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,                   // 10 attempts per IP per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'Too many PIN attempts. Try again in 15 minutes.' },
+});
 
 router.get('/', async (req, res) => {
   try {
@@ -21,7 +30,7 @@ router.get('/', async (req, res) => {
 });
 
 // PIN verification endpoint — frontend sends role + pin, gets back ok/fail
-router.post('/verify-pin', async (req, res) => {
+router.post('/verify-pin', pinLimiter, async (req, res) => {
   try {
     const { role, pin } = req.body;
     if (!role || !pin) return res.status(400).json({ ok: false });

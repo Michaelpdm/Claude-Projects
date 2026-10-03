@@ -79,6 +79,11 @@ export default function PinLogin() {
         method: 'POST',
         body: JSON.stringify({ role: selectedRole, pin: entered }),
       });
+      if (res.status === 429) {
+        setError('Too many attempts. Wait 15 minutes.');
+        setPin('');
+        return;
+      }
       const { ok } = await res.json();
       if (ok) {
         login(selectedRole);
@@ -87,7 +92,7 @@ export default function PinLogin() {
         setPin('');
       }
     } catch {
-      setError('Could not verify PIN. Try again.');
+      setError('Connection error. Try again.');
       setPin('');
     }
   };
