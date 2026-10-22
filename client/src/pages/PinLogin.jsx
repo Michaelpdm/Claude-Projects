@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Briefcase, User, Delete, ArrowLeft } from 'lucide-react';
 import { apiFetch } from '../utils/api';
@@ -101,14 +101,15 @@ export default function PinLogin() {
 
   if (!settings) {
     return (
-      <div className="min-h-screen bg-emerald-700 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-5">
+        <div className="w-8 h-8 border-4 border-gold-500 border-t-transparent rounded-full animate-spin" />
+        <a href="/demo" className="btn-primary">Start demo</a>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-700 to-purple-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6">
       {/* Store name */}
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-zinc-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
@@ -141,6 +142,7 @@ export default function PinLogin() {
               </div>
             </button>
           ))}
+          <a href="/demo" className="btn-secondary w-full !py-3">Start demo</a>
         </div>
       ) : (
         /* PIN entry */

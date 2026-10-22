@@ -1,70 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme tokens ───────────────────────────────────────────────
+   Dark  = "Midnight & Champagne" (default)
+   Light = "Porcelain"
+   Values are space-separated RGB so Tailwind opacity modifiers work. */
+:root {
+  --z-50: 246 244 240;  --z-100: 236 234 230; --z-200: 212 210 206;
+  --z-300: 180 184 192; --z-400: 138 143 154; --z-500: 98 104 118;
+  --z-600: 58 65 80;    --z-700: 35 40 51;    --z-800: 24 28 36;
+  --z-900: 17 20 26;    --z-950: 10 12 16;
+
+  --gold-50: 30 26 18;  --gold-100: 42 36 22; --gold-200: 74 63 37;
+  --gold-300: 143 120 66; --gold-400: 217 190 133; --gold-500: 200 169 106;
+  --gold-600: 200 169 106; --gold-700: 176 148 87; --gold-800: 143 120 66;
+  --gold-900: 74 63 37; --gold-950: 40 34 20;
+
+  --peri: 124 140 248;  --rose: 226 125 142; --amber: 229 166 69;
+  --coral: 224 96 90;   --sand: 217 185 140; --slate: 92 107 133; --lilac: 169 146 226;
+
+  --accent: 200 169 106;
+  --on-accent: 10 12 16;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --z-50: 11 12 15;     --z-100: 22 24 29;    --z-200: 42 45 51;
+  --z-300: 74 77 85;    --z-400: 107 111 120; --z-500: 143 138 128;
+  --z-600: 201 196 186; --z-700: 227 223 215; --z-800: 240 237 231;
+  --z-900: 255 255 255; --z-950: 246 244 240;
+
+  --gold-50: 250 244 230; --gold-100: 243 232 205; --gold-200: 232 214 170;
+  --gold-300: 203 177 118; --gold-400: 184 152 88; --gold-500: 168 135 74;
+  --gold-600: 168 135 74; --gold-700: 140 110 56; --gold-800: 112 88 44;
+  --gold-900: 84 66 33; --gold-950: 56 44 22;
+
+  --peri: 84 100 214; --rose: 200 82 104; --amber: 196 128 24; --coral: 200 62 56;
+  --accent: 168 135 74;
+  --on-accent: 255 255 255;
+  color-scheme: light;
+}
+
 @layer base {
+  html { font-size: 14px; }
   body {
     @apply bg-zinc-950 text-zinc-100 font-sans antialiased;
+    font-variant-numeric: tabular-nums;
   }
+  :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; }
 }
 
 @layer components {
   /* ── Buttons ── */
   .btn {
-    @apply inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500;
+    @apply btn bg-gold-500 hover:bg-gold-400;
+    color: rgb(var(--on-accent));
   }
   .btn-secondary {
-    @apply btn bg-zinc-800 text-zinc-200 border border-zinc-700 hover:bg-zinc-700 focus:ring-zinc-600;
+    @apply btn bg-zinc-800 text-zinc-200 border border-zinc-700 hover:bg-zinc-700;
   }
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    @apply btn bg-coral text-white hover:opacity-90;
   }
   .btn-success {
-    @apply btn bg-emerald-700 text-white hover:bg-emerald-800 focus:ring-emerald-500;
+    @apply btn bg-gold-700 hover:bg-gold-600;
+    color: rgb(var(--on-accent));
   }
   .btn-ghost {
-    @apply btn bg-transparent text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus:ring-zinc-600;
+    @apply btn bg-transparent text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200;
   }
 
   /* ── Cards ── */
   .card {
-    @apply bg-zinc-900 rounded-2xl border border-zinc-800 p-6;
+    @apply bg-zinc-900 rounded-xl border border-zinc-700 p-4;
+    box-shadow: inset 0 1px 0 rgb(var(--z-100) / 0.05);
   }
 
   /* ── Form elements ── */
   .input {
     @apply block w-full rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 text-sm
-           focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500
-           transition-all placeholder:text-zinc-500;
+           focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-gold-500
+           transition-colors placeholder:text-zinc-500;
   }
-  .label {
-    @apply block text-sm font-medium text-zinc-300 mb-1;
-  }
-  .select {
-    @apply input cursor-pointer;
-  }
+  .label { @apply block text-sm font-medium text-zinc-300 mb-1; }
+  .select { @apply input cursor-pointer; }
 
   /* ── Badges ── */
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-  .badge-green  { @apply badge bg-emerald-900/60 text-emerald-400 border border-emerald-800/60; }
-  .badge-red    { @apply badge bg-red-900/60 text-red-400 border border-red-800/60; }
-  .badge-amber  { @apply badge bg-amber-900/60 text-amber-400 border border-amber-800/60; }
-  .badge-gray   { @apply badge bg-zinc-800 text-zinc-400 border border-zinc-700; }
-  .badge-blue   { @apply badge bg-blue-900/60 text-blue-400 border border-blue-800/60; }
-  .badge-purple { @apply badge bg-purple-900/60 text-purple-400 border border-purple-800/60; }
+  .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border; }
+  .badge-green  { @apply badge bg-peri/10 text-peri border-peri/30; }
+  .badge-red    { @apply badge bg-coral/10 text-coral border-coral/30; }
+  .badge-amber  { @apply badge bg-amber/10 text-amber border-amber/30; }
+  .badge-gray   { @apply badge bg-zinc-800 text-zinc-400 border-zinc-700; }
+  .badge-blue   { @apply badge bg-peri/10 text-peri border-peri/30; }
+  .badge-purple { @apply badge bg-lilac/10 text-lilac border-lilac/30; }
 
   /* ── Tables ── */
-  .table-th {
-    @apply px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider;
-  }
-  .table-td {
-    @apply px-4 py-3 text-sm text-zinc-300;
-  }
+  .table-th { @apply px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider; }
+  .table-td { @apply px-4 py-3 text-sm text-zinc-300; }
+
+  /* ── Dashboard bits ── */
+  .panel-title { @apply text-[13px] font-semibold text-zinc-200; }
+  .kpi-value { @apply text-[26px] leading-none font-semibold text-zinc-100 tracking-tight; }
+}
+
+/* Motion */
+@keyframes slide-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes pop-in   { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes dot      { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+.anim-slide-in { animation: slide-in 240ms ease-out both; }
+.anim-pop-in   { animation: pop-in 220ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
 
 /* Print styles */
@@ -78,5 +130,5 @@
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #52525b; }
+::-webkit-scrollbar-thumb { background: rgb(var(--z-600)); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--z-500)); }

@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PinLogin from './pages/PinLogin';
 import Layout from './components/Layout';
@@ -13,6 +13,7 @@ import Invoices from './pages/Invoices';
 import Debits from './pages/Debits';
 import Messages from './pages/Messages';
 import Settings from './pages/Settings';
+import Demo from './pages/Demo';
 import { Lock } from 'lucide-react';
 
 function OwnerOnly({ children }) {
@@ -68,7 +69,10 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <AppRoutes />
+        <Routes>
+          <Route path="/demo" element={<Demo />} />
+          <Route path="/*" element={<AppRoutes />} />
+        </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
