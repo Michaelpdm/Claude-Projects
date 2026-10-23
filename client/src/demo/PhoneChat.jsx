@@ -5,14 +5,14 @@ import { rng } from './demoData';
 
 // A phone that plays customers messaging the store while the owner is away. Each customer line is answered
 // by the real assistant engine (shared/assistant.js) using the store's current stock and settings.
-export default function PhoneChat({ products, settings, speed = 1, paused = false, onEvent, seed = 7 }) {
+export default function PhoneChat({ products, settings, ready = true, speed = 1, paused = false, onEvent, seed = 7 }) {
   const [person, setPerson] = useState(null);
   const [messages, setMessages] = useState([]);
   const [typing, setTyping] = useState(null); // 'bot' | 'customer' | null
   const [notice, setNotice] = useState(null);
   const scroller = useRef(null);
   const live = useRef({});
-  live.current = { products, settings, speed, paused, onEvent };
+  live.current = { products, settings, ready, speed, paused, onEvent };
 
   useEffect(() => {
     let alive = true;
@@ -27,6 +27,7 @@ export default function PhoneChat({ products, settings, speed = 1, paused = fals
       let uid = 0;
       let round = 0;
       while (alive) {
+        while (alive && !live.current.ready) await new Promise((r) => setTimeout(r, 150)); // wait for the stock to load
         // rebuilt every round so the conversations reflect the stock as it is right now
         const scripts = buildScripts(live.current.products, rng(seed + round * 13));
         for (const script of scripts) {

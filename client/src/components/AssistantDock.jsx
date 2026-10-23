@@ -19,6 +19,7 @@ export default function AssistantDock() {
   const [speed, setSpeed] = useState(1);
   const [products, setProducts] = useState([]);
   const [settings, setSettings] = useState({});
+  const [ready, setReady] = useState(false);
   const [stats, setStats] = useState({ replies: demo ? 23 : 0, leads: demo ? 9 : 0, orders: demo ? 4 : 0 });
 
   const toggle = (v) => {
@@ -30,6 +31,7 @@ export default function AssistantDock() {
     const [p, s] = await Promise.all([apiFetch('/api/products', { silent: true }), apiFetch('/api/settings', { silent: true })]);
     if (p.ok) setProducts(await p.json());
     if (s.ok) setSettings(await s.json());
+    setReady(true);
   }, []);
 
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function AssistantDock() {
                 ? 'When customers message while you are away, the assistant replies instantly using your live stock and prices.'
                 : 'Preview: this is how the assistant will answer customers using your real stock. It is not connected to WhatsApp yet.'}
             </p>
-            <PhoneChat products={products} settings={settings} speed={speed} paused={paused} onEvent={onEvent} />
+            <PhoneChat products={products} settings={settings} ready={ready} speed={speed} paused={paused} onEvent={onEvent} />
           </div>
 
           <div className="space-y-2.5 p-3">
