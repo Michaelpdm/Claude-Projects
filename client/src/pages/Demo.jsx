@@ -9,6 +9,7 @@ export default function Demo() {
   const navigate = useNavigate();
   useEffect(() => {
     enterDemo();
+    try { localStorage.setItem('fs_phone_open', '1'); } catch { /* storage unavailable */ } // always show the phone in the demo
     login('owner', 'demo-token');
     navigate('/home', { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
