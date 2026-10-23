@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query } from '../db.js';
 import { requireRole, wrap } from '../http.js';
+import { buildDashboard } from '../../../shared/dashboard.js';
 
 const router = Router();
 router.use(requireRole('manager'));
@@ -34,6 +35,24 @@ router.get('/pl', wrap(async (req, res) => {
     transactions: sales.rows[0].transactions,
     margin: revenue > 0 ? Math.round((netProfit / revenue) * 100) : 0,
   });
+}));
+
+// One call that feeds the whole Home dashboard
+router.get('/dashboard', wrap(async (_req, res) => {
+  const [sales, products, debts, settings] = await Promise.all([
+    query(`SELECT s.id, s.order_ref, s.created_at, s.quantity, s.sale_price, s.discount, s.payment_method, s.customer_name,
+                  p.name AS product_name, p.category, p.cost
+           FROM sales s LEFT JOIN products p ON s.product_id = p.id
+           WHERE s.created_at > now() - interval '90 days'`),
+    query('SELECT id, name, size, color, stock_quantity, low_stock_threshold FROM products'),
+    query('SELECT amount, status FROM debits'),
+    query(`SELECT key, value FROM settings WHERE key IN ('store_name', 'daily_target')`),
+  ]);
+  res.json(buildDashboard({
+    sales: sales.rows, products: products.rows, debts: debts.rows,
+    settings: Object.fromEntries(settings.rows.map((r) => [r.key, r.value])),
+    now: Date.now(),
+  }));
 }));
 
 router.get('/bestsellers', wrap(async (_req, res) => {

@@ -132,7 +132,8 @@ export default function PinLogin() {
               </div>
             </button>
           ))}
-          <a href="/demo" className="btn-secondary w-full !py-3">Start demo</a>
+          <a href="/demo" className="btn-primary w-full !py-3 mt-1">▶ Watch the demo</a>
+          <p className="text-center text-xs text-zinc-500">See the app with example data. Nothing is saved.</p>
         </div>
       ) : (
         <div className="w-full max-w-xs">

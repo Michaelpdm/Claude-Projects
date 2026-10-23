@@ -1,5 +1,6 @@
-﻿import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { getToken, setToken } from '../utils/api';
+import { exitDemo } from '../demo/mockApi';
 
 const AuthContext = createContext();
 
@@ -17,6 +18,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    exitDemo();
     setToken('');
     setRole(null);
     try { sessionStorage.removeItem('app_role'); } catch { /* storage unavailable */ }

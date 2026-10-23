@@ -1,3 +1,5 @@
+import { isDemo, demoRequest } from '../demo/mockApi';
+
 const TOKEN_KEY = 'app_token';
 
 export const getToken = () => {
@@ -27,14 +29,20 @@ export async function apiFetch(url, options = {}) {
   };
 
   let res;
+  const demo = isDemo();
   try {
-    res = await fetch(url, { ...rest, headers: h });
+    if (demo) {
+      await new Promise((r) => setTimeout(r, 90)); // feel like a real request
+      try { res = demoRequest(method, url, rest.body); } catch { res = failure(500, 'Demo hiccup. Please try again.'); }
+    } else {
+      res = await fetch(url, { ...rest, headers: h });
+    }
   } catch {
     if (!silent) toast('error', 'Cannot reach the server. Check your internet connection.');
     return failure(503, 'Cannot reach the server');
   }
 
-  if (res.status === 401 && token) {
+  if (res.status === 401 && token && !demo) {
     setToken('');
     window.dispatchEvent(new Event('fs-logout'));
     toast('error', 'Your session ended. Please sign in again.');
@@ -47,7 +55,7 @@ export async function apiFetch(url, options = {}) {
       try { msg = (await res.clone().json()).error || msg; } catch { /* body is not JSON */ }
       toast('error', msg);
     } else if (method !== 'GET') {
-      toast('success', successMessage || 'Saved');
+      toast('success', successMessage || (demo ? 'Done (demo data only, nothing is saved)' : 'Saved'));
     }
   }
   return res;

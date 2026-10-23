@@ -1,229 +1,259 @@
-﻿import { useState, useEffect } from 'react';
-import { Plus, AlertTriangle, Clock, TrendingUp, Package, ShoppingCart, Activity } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+﻿import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { MessageCircle, Plus, ReceiptText, ShoppingBag, UserPlus, PackageOpen, TriangleAlert } from 'lucide-react';
 import { apiFetch } from '../utils/api';
+import { isDemo, demoAddActivity, demoRecordChatSale } from '../demo/mockApi';
+import PhoneChat from '../demo/PhoneChat';
+import {
+  Card, Delta, Donut, Heatmap, Kpi, Ring, naira, nairaCompact, useChartColors, useCountUp,
+} from '../components/dash';
+
+const FEED_ICON = {
+  sale: [ShoppingBag, 'text-gold-400 bg-gold-500/10'],
+  lead: [UserPlus, 'text-peri bg-peri/10'],
+  invoice: [ReceiptText, 'text-lilac bg-lilac/10'],
+  reserve: [ReceiptText, 'text-lilac bg-lilac/10'],
+  reply: [MessageCircle, 'text-rose bg-rose/10'],
+};
+
+const ago = (at, now) => {
+  const m = Math.max(0, Math.round((now - at) / 60000));
+  return m < 1 ? 'now' : m < 60 ? `${m}m` : m < 1440 ? `${Math.floor(m / 60)}h` : `${Math.floor(m / 1440)}d`;
+};
 
 export default function Home() {
-  const [summary, setSummary] = useState({ today: { total: 0, count: 0 }, thisWeek: { total: 0, count: 0 }, thisMonth: { total: 0 } });
-  const [recentSales, setRecentSales] = useState([]);
-  const [lowStock, setLowStock] = useState([]);
-  const [storeName, setStoreName] = useState('My Store');
-  const [peakHours, setPeakHours] = useState([]);
-  const navigate = useNavigate();
+  const C = useChartColors();
+  const [d, setD] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const [replies, setReplies] = useState(23);
+  const [leads, setLeads] = useState(9);
+  const demo = isDemo();
 
-  const fmt = (n) => `₦${Number(n || 0).toLocaleString()}`;
-
-  useEffect(() => {
-    Promise.all([
-      apiFetch('/api/sales/summary').then(r => r.json()),
-      apiFetch('/api/sales').then(r => r.json()),
-      apiFetch('/api/products').then(r => r.json()),
-      apiFetch('/api/settings').then(r => r.json()),
-      apiFetch('/api/sales/peak-hours').then(r => r.json()),
-    ]).then(([sum, sales, products, settings, hours]) => {
-      setSummary(sum);
-      setRecentSales((sales || []).slice(0, 5));
-      setLowStock((products || []).filter(p => p.stock_quantity <= 5));
-      if (settings?.store_name) setStoreName(settings.store_name);
-      if (Array.isArray(hours)) setPeakHours(hours);
-    }).catch(() => {});
+  const load = useCallback(async () => {
+    const res = await apiFetch('/api/reports/dashboard', { silent: true });
+    if (!res.ok) { setFailed(true); return; }
+    setFailed(false);
+    setD(await res.json());
   }, []);
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  useEffect(() => {
+    load();
+    const t = setInterval(load, demo ? 4000 : 60000);
+    return () => clearInterval(t);
+  }, [load, demo]);
+
+  const onChatEvent = useCallback((ev) => {
+    if (ev.type === 'lead') {
+      setLeads((n) => n + 1);
+      setReplies((n) => n + 1);
+      demoAddActivity({ type: 'lead', title: ev.label, meta: 'WhatsApp assistant' });
+    } else {
+      if (ev.type === 'sale') demoRecordChatSale(ev);
+      demoAddActivity({ type: ev.type, title: ev.product, meta: `${ev.buyer} · ${ev.channel}`, amount: ev.amount });
+    }
+    load();
+  }, [load]);
+
+  const revenue = useCountUp(d?.today.revenue || 0, 900);
+
+  if (!d) {
+    return (
+      <div className="p-6 text-center text-zinc-400">
+        {failed
+          ? <>We couldn’t load your dashboard. <button className="text-gold-400 underline" onClick={load}>Try again</button></>
+          : 'Loading your dashboard…'}
+      </div>
+    );
+  }
+
+  const t = d.today;
+  const empty = t.orders === 0 && d.daily.every((x) => x.revenue === 0);
+  const catColors = [C.accent, C.peri, C.rose, C.sand, C.slate, C.lilac];
+  const maxTop = d.top_products[0]?.revenue || 1;
+  const dateText = new Date(d.now + 3600000).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      {/* Greeting */}
-      <div className="mb-5">
-        <h1 className="text-2xl font-bold text-zinc-50">{greeting}, {storeName}</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">Here's how your store is doing today</p>
-      </div>
-
-      {/* Today's Revenue Card */}
-      <div className="bg-emerald-600 rounded-2xl p-5 mb-4 text-white shadow-lg">
-        <p className="text-emerald-200 text-sm mb-1">Today's Revenue</p>
-        <p className="text-4xl font-bold tracking-tight">{fmt(summary.today?.total)}</p>
-        <p className="text-emerald-200 text-sm mt-1">{summary.today?.count || 0} sales today</p>
-        <div className="flex gap-6 mt-4 pt-4 border-t border-emerald-500">
-          <div>
-            <p className="text-emerald-300 text-xs">This Week</p>
-            <p className="font-semibold text-sm">{fmt(summary.thisWeek?.total)}</p>
-          </div>
-          <div>
-            <p className="text-emerald-300 text-xs">This Month</p>
-            <p className="font-semibold text-sm">{fmt(summary.thisMonth?.total)}</p>
-          </div>
+    <div className="mx-auto max-w-[1600px] p-3 md:p-5">
+      {/* greeting */}
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold text-zinc-100 md:text-2xl">{d.greeting}, {d.store_name}</h1>
+          <p className="text-sm text-zinc-400">{dateText}</p>
         </div>
+        <Link to="/sales" className="btn-primary shrink-0"><Plus size={16} /> New sale</Link>
       </div>
 
-      {/* Quick Action */}
-      <button
-        onClick={() => navigate('/sales')}
-        className="w-full bg-zinc-950 hover:bg-zinc-700 active:scale-95 text-white rounded-2xl py-4 flex items-center justify-center gap-3 font-semibold text-base mb-6 transition-all shadow"
-      >
-        <div className="bg-emerald-500 rounded-lg p-1"><Plus size={18} /></div>
-        Make a Sale
-      </button>
-
-      {/* Quick Stats Row */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <button onClick={() => navigate('/inventory')} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-left hover:border-emerald-300 transition-colors shadow-sm">
-          <div className="bg-emerald-50 rounded-lg p-2 w-fit mb-2"><Package size={18} className="text-emerald-600" /></div>
-          <p className="text-xs text-zinc-400">Total Products</p>
-          <p className="text-xl font-bold text-zinc-50">{lowStock.length > 0 ? <span className="text-amber-600">{lowStock.length} low</span> : 'All good'}</p>
-          <p className="text-xs text-emerald-600 mt-1">View inventory →</p>
-        </button>
-        <button onClick={() => navigate('/sales')} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-left hover:border-emerald-300 transition-colors shadow-sm">
-          <div className="bg-emerald-50 rounded-lg p-2 w-fit mb-2"><ShoppingCart size={18} className="text-emerald-600" /></div>
-          <p className="text-xs text-zinc-400">Week Sales</p>
-          <p className="text-xl font-bold text-zinc-50">{summary.thisWeek?.count || 0}</p>
-          <p className="text-xs text-emerald-600 mt-1">View all sales →</p>
-        </button>
-      </div>
-
-      {/* Low Stock Alerts */}
-      {lowStock.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle size={15} className="text-amber-500" />
-            <h2 className="font-semibold text-zinc-50 text-sm">Low Stock Alert</h2>
-          </div>
-          <div className="space-y-2">
-            {lowStock.slice(0, 4).map(p => (
-              <div key={p.id} className="flex items-center justify-between bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
-                <div>
-                  <p className="font-medium text-zinc-50 text-sm">{p.name}</p>
-                  <p className="text-xs text-zinc-400">{[p.category, p.size, p.color].filter(Boolean).join(' · ')}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-amber-700 font-bold text-sm">{p.stock_quantity} left</p>
-                  <button onClick={() => navigate('/inventory')} className="text-xs text-emerald-600">Restock →</button>
-                </div>
-              </div>
-            ))}
-          </div>
+      {empty && (
+        <div className="card mb-3 flex items-center gap-3 !border-gold-500/40 text-sm text-zinc-300">
+          <PackageOpen size={18} className="shrink-0 text-gold-500" />
+          <span>Nothing sold yet. Add your products in <Link className="text-gold-400 underline" to="/inventory">Inventory</Link>, then make your first sale.</span>
         </div>
       )}
 
-      {/* Peak Hours Chart */}
-      <PeakHoursChart data={peakHours} />
-
-      {/* Recent Sales */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Clock size={15} className="text-zinc-500" />
-          <h2 className="font-semibold text-zinc-50 text-sm">Recent Sales</h2>
-        </div>
-        {recentSales.length === 0 ? (
-          <div className="text-center py-10 text-zinc-500">
-            <ShoppingCart size={36} className="mx-auto mb-2 opacity-20" />
-            <p className="text-sm">No sales recorded yet</p>
-            <button onClick={() => navigate('/sales')} className="mt-3 text-emerald-600 text-sm font-medium">Record your first sale →</button>
+      <div className="grid grid-cols-12 gap-3">
+        {/* hero: today's revenue */}
+        <section className="card col-span-12 flex flex-col justify-between gap-4 !p-5 lg:col-span-5" style={{ background: 'linear-gradient(135deg, rgb(var(--gold-500) / 0.16), rgb(var(--z-900)) 65%)' }}>
+          <div>
+            <div className="flex items-center justify-between text-sm text-zinc-300">
+              <span>Today’s revenue</span>
+              <span className="flex items-center gap-1 text-xs text-zinc-400">vs yesterday <Delta value={d.change.revenue} /></span>
+            </div>
+            <div className="mt-2 text-[40px] font-semibold leading-none tracking-tight text-zinc-100">{naira(revenue)}</div>
+            <div className="mt-2 text-sm text-zinc-300"><b className="text-zinc-100">{t.orders}</b> {t.orders === 1 ? 'sale' : 'sales'} made today · {t.items} items</div>
           </div>
-        ) : (
-          <div className="space-y-2">
-            {recentSales.map(s => (
-              <div key={s.id} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 shadow-sm">
-                <div>
-                  <p className="font-medium text-zinc-50 text-sm">{s.product_name}</p>
-                  <p className="text-xs text-zinc-500">Qty {s.quantity} · {s.payment_method}{s.customer_name ? ` · ${s.customer_name}` : ''}</p>
+          <div className="flex items-center gap-4">
+            <Ring pct={d.rings.daily} size={96} stroke={9} color={C.accent}>
+              <span className="text-lg font-semibold">{Math.round(d.rings.daily)}%</span>
+            </Ring>
+            <div className="text-sm">
+              <div className="text-zinc-400">Daily target</div>
+              <div className="font-semibold text-zinc-100">{nairaCompact(t.revenue)} <span className="font-normal text-zinc-400">of {nairaCompact(d.target)}</span></div>
+              <div className="text-xs text-zinc-400">{t.revenue >= d.target ? 'Target reached 🎉' : `${nairaCompact(d.target - t.revenue)} to go`}</div>
+            </div>
+          </div>
+        </section>
+
+        {/* KPI grid */}
+        <div className="col-span-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-7">
+          <Kpi id="rev" label="Revenue" value={t.revenue} format={nairaCompact} change={d.change.revenue} spark={d.spark.revenue} color={C.accent} />
+          <Kpi id="ord" label="Orders" value={t.orders} format={(v) => Math.round(v)} change={d.change.orders} spark={d.spark.orders} color={C.peri} />
+          <Kpi id="itm" label="Items sold" value={t.items} format={(v) => Math.round(v)} change={d.change.items} spark={d.spark.orders} color={C.rose} />
+          <Kpi id="aov" label="Avg order" value={t.aov} format={nairaCompact} change={d.change.aov} spark={d.spark.aov} color={C.sand} />
+          <Kpi id="pro" label="Gross profit" value={t.profit} format={nairaCompact} change={d.change.profit} spark={d.spark.profit} color={C.lilac} />
+          <Kpi id="dbt" label="Owed to you" value={t.debts} format={nairaCompact} change={null} spark={d.spark.revenue} color={C.slate} />
+        </div>
+
+        {/* left column */}
+        <div className="col-span-12 grid grid-cols-12 content-start gap-3 xl:col-span-8">
+          <Card className="col-span-12 lg:col-span-8" title="Revenue and profit · today" right={<span className="text-[11px] text-zinc-400">hourly</span>}>
+            <div className="h-[230px]">
+              <ResponsiveContainer>
+                <AreaChart data={d.hourly} margin={{ top: 4, right: 6, bottom: 0, left: -8 }}>
+                  <defs>
+                    <linearGradient id="gRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={C.accent} stopOpacity={0.35} />
+                      <stop offset="100%" stopColor={C.accent} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke={C.grid} vertical={false} />
+                  <XAxis dataKey="hour" tick={{ fill: C.tick, fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={nairaCompact} tick={{ fill: C.tick, fontSize: 11 }} axisLine={false} tickLine={false} width={58} />
+                  <Tooltip formatter={(v, n) => [naira(v), n === 'revenue' ? 'Revenue' : 'Profit']} contentStyle={{ background: C.tip, border: `1px solid ${C.grid}`, borderRadius: 8, fontSize: 12 }} />
+                  <Area type="monotone" dataKey="revenue" stroke={C.accent} strokeWidth={2} fill="url(#gRev)" />
+                  <Area type="monotone" dataKey="profit" stroke={C.peri} strokeWidth={2} fill="none" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          <Card className="col-span-12 lg:col-span-4" title="How you’re doing">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-4 pt-1">
+              {[['Today’s target', d.rings.daily, C.accent], ['This month', d.rings.monthly, C.peri], ['Stock health', d.rings.stock, C.rose], ['Debt collected', d.rings.debt, C.sand]].map(([label, p, c]) => (
+                <div key={label} className="flex flex-col items-center">
+                  <Ring pct={p} size={84} stroke={8} color={c}><span className="text-[15px] font-semibold">{Math.round(p)}%</span></Ring>
+                  <span className="mt-1.5 text-[11px] text-zinc-400">{label}</span>
                 </div>
-                <p className="font-bold text-zinc-50 text-sm">{fmt(s.sale_price * s.quantity)}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+              ))}
+            </div>
+          </Card>
 
-function PeakHoursChart({ data }) {
-  const currentHour = new Date().getHours();
-  const hasData = data.some(d => d.count > 0);
-  const maxCount = Math.max(...data.map(d => d.count), 1);
+          <Card className="col-span-12 lg:col-span-12" title="Last 30 days" right={<span className="text-[11px] text-zinc-400">revenue</span>}>
+            <div className="h-[170px]">
+              <ResponsiveContainer>
+                <AreaChart data={d.daily} margin={{ top: 4, right: 6, bottom: 0, left: -8 }}>
+                  <defs>
+                    <linearGradient id="gDay" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={C.peri} stopOpacity={0.3} />
+                      <stop offset="100%" stopColor={C.peri} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke={C.grid} vertical={false} />
+                  <XAxis dataKey="date" tick={{ fill: C.tick, fontSize: 11 }} axisLine={false} tickLine={false} interval={4} />
+                  <YAxis tickFormatter={nairaCompact} tick={{ fill: C.tick, fontSize: 11 }} axisLine={false} tickLine={false} width={58} />
+                  <Tooltip formatter={(v) => [naira(v), 'Revenue']} contentStyle={{ background: C.tip, border: `1px solid ${C.grid}`, borderRadius: 8, fontSize: 12 }} />
+                  <Area type="monotone" dataKey="revenue" stroke={C.peri} strokeWidth={2} fill="url(#gDay)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
 
-  const labelHours = [0, 3, 6, 9, 12, 15, 18, 21];
-  const fmt12 = (h) => {
-    if (h === 0) return '12a';
-    if (h === 12) return '12p';
-    return h < 12 ? `${h}a` : `${h - 12}p`;
-  };
+          <Card className="col-span-12 md:col-span-6 lg:col-span-4" title="Sales by category"><Donut data={d.categories} colors={catColors} tip={C.tip} /></Card>
+          <Card className="col-span-12 md:col-span-6 lg:col-span-4" title="Payment method"><Donut data={d.payments} colors={[C.accent, C.peri, C.sand, C.rose]} tip={C.tip} /></Card>
+          <Card className="col-span-12 lg:col-span-4" title="Busy hours"><Heatmap rows={d.heatmap} color={C.accent} /></Card>
 
-  const peak = data.length > 0
-    ? data.reduce((best, d) => (d.count > best.count ? d : best), { hour: -1, count: 0 })
-    : { hour: -1, count: 0 };
+          <Card className="col-span-12 md:col-span-6" title="Top products · 30 days">
+            {d.top_products.length === 0 ? <p className="py-6 text-center text-sm text-zinc-500">No sales yet</p> : (
+              <ul className="space-y-2.5">
+                {d.top_products.map((p, i) => (
+                  <li key={p.name} className="text-[12px]">
+                    <div className="flex items-center gap-2">
+                      <span className="w-4 text-zinc-500">{i + 1}</span>
+                      <span className="truncate text-zinc-200">{p.name}</span>
+                      <span className="ml-auto text-zinc-400">{p.units} sold</span>
+                      <span className="w-16 text-right font-medium">{nairaCompact(p.revenue)}</span>
+                    </div>
+                    <div className="ml-6 mt-1 h-1 rounded-full bg-zinc-700"><div className="h-1 rounded-full bg-gold-500" style={{ width: `${(p.revenue / maxTop) * 100}%` }} /></div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
 
-  return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Activity size={15} className="text-amber-400" />
-          <h2 className="font-semibold text-zinc-50 text-sm">Sales Traffic</h2>
+          <Card className="col-span-12 md:col-span-6" title="Running low" right={d.low_stock.length ? <TriangleAlert size={14} className="text-amber" /> : null}>
+            {d.low_stock.length === 0 ? <p className="py-6 text-center text-sm text-zinc-500">All items well stocked</p> : (
+              <ul className="divide-y divide-zinc-700">
+                {d.low_stock.map((p) => (
+                  <li key={p.id} className="flex items-center gap-2 py-2 text-[12px] first:pt-0">
+                    <div className="min-w-0"><div className="truncate text-zinc-200">{p.name}</div><div className="text-zinc-400">{p.variant}</div></div>
+                    <span className={`ml-auto badge ${p.left <= 1 ? 'badge-red' : 'badge-amber'}`}>{p.left === 0 ? 'Out' : `${p.left} left`}</span>
+                    <Link to="/inventory" className="btn-secondary !px-2 !py-1 text-xs">Restock</Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
         </div>
-        <span className="text-xs text-zinc-500">last 7 days</span>
-      </div>
 
-      {!hasData ? (
-        <div className="text-center py-6 text-zinc-600 text-xs">No sales data yet — chart fills as you record sales</div>
-      ) : (
-        <>
-          {peak.count > 0 && (
-            <p className="text-xs text-zinc-500 mb-3">
-              Busiest: <span className="text-amber-400 font-semibold">{fmt12(peak.hour)}–{fmt12((peak.hour + 1) % 24)}</span>
-              <span className="text-zinc-600"> · {peak.count} sale{peak.count !== 1 ? 's' : ''}</span>
-            </p>
+        {/* right column */}
+        <div className="col-span-12 flex flex-col gap-3 xl:col-span-4">
+          {demo ? (
+            <Card title="WhatsApp assistant" right={<span className="badge badge-green">Owner away · replying</span>}>
+              <PhoneChat onEvent={onChatEvent} />
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                {[['Auto-replies', replies], ['Leads saved', leads], ['Avg reply', '3s']].map(([l, v]) => (
+                  <div key={l} className="rounded-lg bg-zinc-800 py-2"><div className="text-[15px] font-semibold">{v}</div><div className="text-[10px] text-zinc-400">{l}</div></div>
+                ))}
+              </div>
+            </Card>
+          ) : (
+            <Card title="WhatsApp assistant">
+              <div className="py-4 text-center text-sm text-zinc-400">
+                <MessageCircle className="mx-auto mb-2 text-gold-500" size={22} />
+                Not connected yet. When it is, it will answer customers automatically while you’re away.
+                <div className="mt-3"><Link to="/settings" className="btn-secondary">Open settings</Link></div>
+              </div>
+            </Card>
           )}
 
-          <div className="flex items-end gap-[2px] h-20">
-            {data.map(({ hour, count }) => {
-              const heightPct = count === 0 ? 4 : Math.max(8, Math.round((count / maxCount) * 100));
-              const isPeak = count === maxCount && count > 0;
-              const isCurrent = hour === currentHour;
-              return (
-                <div key={hour} className="flex-1 flex flex-col items-center justify-end group relative" style={{ height: '100%' }}>
-                  <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-zinc-700 text-zinc-100 text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
-                    {fmt12(hour)}: {count}
-                  </div>
-                  <div
-                    className={`w-full rounded-sm transition-all ${
-                      isPeak ? 'bg-amber-400' : isCurrent ? 'bg-emerald-500' : count === 0 ? 'bg-zinc-800' : 'bg-emerald-700/70'
-                    }`}
-                    style={{ height: `${heightPct}%` }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex mt-1" style={{ gap: '2px' }}>
-            {data.map(({ hour }) => (
-              <div key={hour} className="flex-1 text-center">
-                {labelHours.includes(hour) && (
-                  <span className="text-[9px] text-zinc-600">{fmt12(hour)}</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-4 mt-2.5">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-sm bg-amber-400" />
-              <span className="text-[10px] text-zinc-500">Busiest</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-sm bg-emerald-500" />
-              <span className="text-[10px] text-zinc-500">Now</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-sm bg-emerald-700/70" />
-              <span className="text-[10px] text-zinc-500">Active</span>
-            </div>
-          </div>
-        </>
-      )}
+          <Card title="Live activity" right={<span className="flex items-center gap-1 text-[11px] text-zinc-400"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-peri" />live</span>}>
+            {d.activity.length === 0 ? <p className="py-6 text-center text-sm text-zinc-500">Sales and messages will show up here</p> : (
+              <ul className="space-y-2">
+                {d.activity.map((f) => {
+                  const [Icon, tone] = FEED_ICON[f.type] || FEED_ICON.sale;
+                  return (
+                    <li key={f.id} className="anim-slide-in flex items-center gap-2.5 text-[12px]">
+                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${tone}`}><Icon size={14} /></span>
+                      <div className="min-w-0"><div className="truncate text-zinc-200">{f.title}</div><div className="truncate text-zinc-400">{f.meta}</div></div>
+                      <div className="ml-auto text-right">{f.amount ? <div className="font-medium">{naira(f.amount)}</div> : null}<div className="text-[10px] text-zinc-500">{ago(f.at, d.now)}</div></div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
-

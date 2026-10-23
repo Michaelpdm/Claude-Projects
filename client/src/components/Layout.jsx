@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MobileHeader from './MobileHeader';
+import TopBar from './TopBar';
 
 export default function Layout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -32,6 +33,7 @@ export default function Layout() {
 
       {/* Main content column */}
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <TopBar />
         <div className="md:hidden">
           <MobileHeader onMenuClick={() => setDrawerOpen(true)} />
         </div>
