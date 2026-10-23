@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { enterDemo } from '../demo/mockApi';
 
@@ -7,11 +7,12 @@ import { enterDemo } from '../demo/mockApi';
 export default function Demo() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   useEffect(() => {
     enterDemo();
     try { localStorage.setItem('fs_phone_open', '1'); } catch { /* storage unavailable */ } // always show the phone in the demo
     login('owner', 'demo-token');
-    navigate('/home', { replace: true });
+    navigate(params.get('assistant') ? '/home?assistant=1' : '/home', { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return <div className="grid min-h-screen place-items-center bg-zinc-950 text-sm text-zinc-400">Opening demo…</div>;

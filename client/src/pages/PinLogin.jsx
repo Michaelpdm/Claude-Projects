@@ -133,6 +133,7 @@ export default function PinLogin() {
             </button>
           ))}
           <a href="/demo" className="btn-primary w-full !py-3 mt-1">▶ Watch the demo</a>
+          <a href="/demo?assistant=1" className="btn-secondary w-full !py-3">💬 See the WhatsApp assistant</a>
           <p className="text-center text-xs text-zinc-500">See the app with example data. Nothing is saved.</p>
         </div>
       ) : (
