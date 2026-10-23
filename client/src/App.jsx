@@ -14,6 +14,7 @@ import Debits from './pages/Debits';
 import Messages from './pages/Messages';
 import Settings from './pages/Settings';
 import Demo from './pages/Demo';
+import Toaster from './components/Toaster';
 import { Lock } from 'lucide-react';
 
 function OwnerOnly({ children }) {
@@ -73,6 +74,7 @@ export default function App() {
           <Route path="/demo" element={<Demo />} />
           <Route path="/*" element={<AppRoutes />} />
         </Routes>
+        <Toaster />
       </BrowserRouter>
     </AuthProvider>
   );

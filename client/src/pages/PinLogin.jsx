@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Briefcase, User, Delete, ArrowLeft } from 'lucide-react';
-import { apiFetch } from '../utils/api';
+import { apiFetch, toast } from '../utils/api';
 
 const ROLES = [
   {
@@ -50,11 +50,6 @@ export default function PinLogin() {
 
   const handleRoleSelect = (roleKey) => {
     const roleDef = ROLES.find(r => r.key === roleKey);
-    const pinStatus = settings?.[roleDef.pinKey];
-    if (!pinStatus) {
-      login(roleKey);
-      return;
-    }
     setSelectedRole(roleKey);
     setPin('');
     setError('');
@@ -78,17 +73,19 @@ export default function PinLogin() {
       const res = await apiFetch('/api/settings/verify-pin', {
         method: 'POST',
         body: JSON.stringify({ role: selectedRole, pin: entered }),
+        silent: true,
       });
       if (res.status === 429) {
         setError('Too many attempts. Wait 15 minutes.');
         setPin('');
         return;
       }
-      const { ok } = await res.json();
-      if (ok) {
-        login(selectedRole);
+      const data = await res.json();
+      if (data.ok) {
+        login(selectedRole, data.token);
+        if (data.setup) toast('info', 'Welcome! Open Settings to set the Owner, Manager and Staff PINs.');
       } else {
-        setError('Wrong PIN. Try again.');
+        setError(data.error || 'Wrong PIN. Try again.');
         setPin('');
       }
     } catch {
@@ -108,92 +105,63 @@ export default function PinLogin() {
     );
   }
 
+  const keyCls = 'bg-zinc-900 border border-zinc-700 rounded-xl h-14 text-zinc-100 text-xl font-semibold hover:bg-zinc-800 active:bg-zinc-700 transition-colors';
+
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6">
-      {/* Store name */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-zinc-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-          <ShieldCheck size={32} className="text-white" />
-        </div>
-        <h1 className="text-2xl font-bold text-white">{storeName}</h1>
-        <p className="text-emerald-200 text-sm mt-1">Who is signing in?</p>
+        <div className="w-14 h-14 rounded-2xl border border-zinc-700 bg-zinc-900 flex items-center justify-center mx-auto mb-4 text-lg font-bold text-gold-500">FS</div>
+        <h1 className="text-xl font-semibold text-zinc-100">{storeName}</h1>
+        <p className="text-zinc-400 text-sm mt-1">Who is signing in?</p>
       </div>
 
       {!selectedRole ? (
-        /* Role selection */
-        <div className="w-full max-w-xs space-y-3">
-          {ROLES.map(({ key, label, desc, icon: Icon, dark }) => (
+        <div className="w-full max-w-xs space-y-2.5">
+          {ROLES.map(({ key, label, desc, icon: Icon }) => (
             <button
               key={key}
               onClick={() => handleRoleSelect(key)}
-              className={`w-full rounded-2xl p-4 flex items-center gap-4 active:scale-95 transition-transform ${
-                dark
-                  ? 'bg-zinc-900 shadow-lg'
-                  : 'bg-zinc-900/15 border border-white/30 backdrop-blur-sm'
-              }`}
+              className="w-full card !p-3.5 flex items-center gap-3.5 text-left hover:border-gold-500/60 transition-colors"
             >
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                dark ? 'bg-emerald-100' : 'bg-zinc-900/20'
-              }`}>
-                <Icon size={22} className={dark ? 'text-emerald-600' : 'text-white'} />
+              <div className="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center flex-shrink-0">
+                <Icon size={20} className="text-gold-500" />
               </div>
-              <div className="text-left">
-                <p className={`font-bold ${dark ? 'text-zinc-50' : 'text-white'}`}>{label}</p>
+              <div>
+                <p className="font-semibold text-zinc-100">{label}</p>
+                <p className="text-xs text-zinc-400">{desc}</p>
               </div>
             </button>
           ))}
           <a href="/demo" className="btn-secondary w-full !py-3">Start demo</a>
         </div>
       ) : (
-        /* PIN entry */
         <div className="w-full max-w-xs">
-          <button
-            onClick={() => setSelectedRole(null)}
-            className="flex items-center gap-1.5 text-emerald-200 text-sm mb-8"
-          >
+          <button onClick={() => setSelectedRole(null)} className="flex items-center gap-1.5 text-zinc-400 hover:text-zinc-100 text-sm mb-6">
             <ArrowLeft size={16} /> Back
           </button>
 
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-zinc-900/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-              {selectedRoleDef && <selectedRoleDef.icon size={24} className="text-white" />}
+          <div className="text-center mb-6">
+            <div className="w-11 h-11 rounded-xl bg-gold-500/10 flex items-center justify-center mx-auto mb-3">
+              {selectedRoleDef && <selectedRoleDef.icon size={22} className="text-gold-500" />}
             </div>
-            <p className="text-white font-semibold text-lg">{selectedRoleDef?.label} PIN</p>
-            {error && <p className="text-red-300 text-sm mt-1">{error}</p>}
+            <p className="text-zinc-100 font-semibold text-lg">{selectedRoleDef?.label} PIN</p>
+            <p role="alert" className="text-coral text-sm mt-1 min-h-[1.25rem]">{error}</p>
           </div>
 
-          {/* PIN dots */}
-          <div className="flex justify-center gap-4 mb-10">
+          <div className="flex justify-center gap-4 mb-8" aria-label={`${pin.length} of 4 digits entered`}>
             {[0, 1, 2, 3].map(i => (
-              <div key={i} className={`w-4 h-4 rounded-full transition-all ${
-                i < pin.length ? 'bg-zinc-900 scale-110' : 'bg-zinc-900/30'
-              }`} />
+              <div key={i} className={`w-3.5 h-3.5 rounded-full transition-all ${i < pin.length ? 'bg-gold-500 scale-110' : 'bg-zinc-700'}`} />
             ))}
           </div>
 
-          {/* Numpad */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2.5">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-              <button
-                key={n}
-                onClick={() => handleKey(String(n))}
-                className="bg-zinc-900/15 border border-white/20 rounded-2xl h-16 text-white text-xl font-semibold active:bg-zinc-900/30 transition-colors"
-              >
-                {n}
-              </button>
+              <button key={n} onClick={() => handleKey(String(n))} className={keyCls}>{n}</button>
             ))}
             <div />
-            <button
-              onClick={() => handleKey('0')}
-              className="bg-zinc-900/15 border border-white/20 rounded-2xl h-16 text-white text-xl font-semibold active:bg-zinc-900/30 transition-colors"
-            >
-              0
-            </button>
-            <button
-              onClick={handleBackspace}
-              className="bg-zinc-900/15 border border-white/20 rounded-2xl h-16 flex items-center justify-center active:bg-zinc-900/30 transition-colors"
-            >
-              <Delete size={20} className="text-white" />
+            <button onClick={() => handleKey('0')} className={keyCls}>0</button>
+            <button onClick={handleBackspace} aria-label="Delete last digit" className={`${keyCls} flex items-center justify-center`}>
+              <Delete size={20} className="text-zinc-300" />
             </button>
           </div>
         </div>
@@ -201,4 +169,3 @@ export default function PinLogin() {
     </div>
   );
 }
-

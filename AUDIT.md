@@ -164,3 +164,23 @@ Duplicate routes: `POST|PUT /debits/:id/clear`, `PATCH|PUT /invoices/:id/status`
 - Controls with working code that only fail because the backend is down: the majority of the app (G1).
 - Real code defects: G3, G4, G5, G6, G7, G9, plus no transactional safety on sales/returns.
 - Features the rebuild prompt asks for that do not exist yet: dashboard widgets, Demo Mode, theme toggle, command palette, variants, part payments, returns UI list, staff table, WhatsApp rules engine, Cloud API adapter, PDF export, Playwright tests.
+
+---
+
+## Update 2026-10-22: backend rebuilt
+
+| Finding | Now |
+|---------|-----|
+| G1 backend gone | **Fixed.** API runs as a Vercel function (`client/api/`), database is Supabase Postgres (`fashion_store` schema, limited `fashion_app` login, RLS on). |
+| G2 silent failures | **Fixed.** `apiFetch` shows an error toast for every failed request and a "Saved" toast after changes. |
+| G3 raw fetch calls | **Fixed.** Customers and Inventory save go through `apiFetch`. |
+| G4 client-only auth | **Fixed.** PIN login returns a signed 12-hour token; every route enforces Owner / Manager / Staff on the server. The shared API key is gone. |
+| G5 open login when no PIN | **Fixed.** Only the owner can enter a fresh store; Manager and Staff need a PIN set first. |
+| G6 image uploads on disk | **Partly fixed.** Images are stored in the database (3 MB max) and served from `/api/products/:id/image`. Supabase Storage is a later step. |
+| G7 WhatsApp | **Not done.** Routes return "disconnected" / a clear message. Cloud API connection is the next feature. |
+| G8 float money | **Fixed.** `numeric(14,2)`. |
+| G9 no variants / order grouping | Orders are grouped by `order_ref`; discount is shared across lines. Size × colour variants are still not built. |
+| Sales/returns atomicity | **Fixed.** Stock is locked and changed inside a transaction; returns cannot exceed what was sold. |
+| Credit sales | **New.** "Credit" payment creates a debt. |
+
+`client/scripts/smoke-api.mjs` runs 31 checks against the API (roles, stock, discounts, returns, credit, CSV). All pass.

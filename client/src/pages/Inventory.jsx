@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Edit2, Trash2, Package, AlertTriangle, X, Upload } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
@@ -66,7 +66,8 @@ export default function Inventory() {
 
     const url = editProduct ? `/api/products/${editProduct.id}` : '/api/products';
     const method = editProduct ? 'PUT' : 'POST';
-    await fetch(url, { method, body: fd });
+    const res = await apiFetch(url, { method, body: fd });
+    if (!res.ok) { setLoading(false); return; }
     setShowForm(false);
     fetchProducts();
     fetchFilters();

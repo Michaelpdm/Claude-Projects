@@ -109,6 +109,9 @@
   .kpi-value { @apply text-[26px] leading-none font-semibold text-zinc-100 tracking-tight; }
 }
 
+/* Gold buttons keep readable text in both themes */
+.bg-emerald-600.text-white, .bg-emerald-700.text-white { color: rgb(var(--on-accent)); }
+
 /* Motion */
 @keyframes slide-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 @keyframes pop-in   { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }

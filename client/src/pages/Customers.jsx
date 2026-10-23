@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Users, Plus, Phone, ShoppingBag, X, Edit2, Trash2, ChevronRight } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
@@ -34,7 +34,8 @@ export default function Customers() {
     setLoading(true);
     const url = editing ? `/api/customers/${editing.id}` : '/api/customers';
     const method = editing ? 'PUT' : 'POST';
-    await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+    const res = await apiFetch(url, { method, body: JSON.stringify(form) });
+    if (!res.ok) { setLoading(false); return; }
     setShowForm(false);
     setEditing(null);
     load();

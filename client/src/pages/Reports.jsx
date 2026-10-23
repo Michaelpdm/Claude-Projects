@@ -1,6 +1,6 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Download, Award } from 'lucide-react';
-import { apiFetch } from '../utils/api';
+import { apiFetch, downloadFile } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 const PERIODS = [
@@ -33,7 +33,7 @@ export default function Reports() {
   useEffect(() => { load(); }, [period]);
 
   const download = (type) => {
-    window.open(`/api/reports/export/${type}`, '_blank');
+    downloadFile(`/api/reports/export/${type}`, `${type}.csv`);
   };
 
   const plRows = pl ? [

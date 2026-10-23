@@ -1,8 +1,8 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Plus, Minus, X, ShoppingBag, CheckCircle, MessageCircle } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
-const PAYMENT_METHODS = ['Cash', 'Transfer', 'POS'];
+const PAYMENT_METHODS = ['Cash', 'Transfer', 'POS', 'Credit'];
 
 export default function Sales() {
   const [products, setProducts] = useState([]);
@@ -295,7 +295,7 @@ export default function Sales() {
               </div>
 
               {/* Payment method */}
-              <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="grid grid-cols-4 gap-2 mb-3">
                 {PAYMENT_METHODS.map(m => (
                   <button key={m} type="button"
                     onClick={() => setPayment(m)}
