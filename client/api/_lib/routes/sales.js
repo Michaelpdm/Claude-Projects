@@ -20,7 +20,7 @@ router.get('/', wrap(async (req, res) => {
 }));
 
 router.get('/summary', wrap(async (_req, res) => {
-  const agg = (where) => query(`SELECT COALESCE(SUM(${NET}), 0) AS total, COUNT(*) AS count FROM sales s WHERE ${where}`);
+  const agg = (where) => query(`SELECT COALESCE(SUM(${NET}), 0) AS total, COUNT(DISTINCT COALESCE(s.order_ref, s.id::text)) AS count FROM sales s WHERE ${where}`);
   const [today, week, month] = await Promise.all([
     agg(LAGOS_DAY),
     agg(`s.created_at >= date_trunc('week', now() AT TIME ZONE 'Africa/Lagos') AT TIME ZONE 'Africa/Lagos'`),

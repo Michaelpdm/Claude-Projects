@@ -294,7 +294,7 @@ export function demoRequest(method, rawUrl, rawBody) {
     case 'sales': {
       const inRange = (from) => st.sales.filter((s) => new Date(s.created_at).getTime() >= from);
       if (a === 'summary') {
-        const agg = (from) => { const l = inRange(from); return { total: l.reduce((t, s) => t + net(s), 0), count: l.length }; };
+        const agg = (from) => { const l = inRange(from); return { total: l.reduce((t, s) => t + net(s), 0), count: new Set(l.map((s) => s.order_ref || s.id)).size }; };
         return json({ today: agg(startOf('today', now)), thisWeek: agg(startOf('week', now)), thisMonth: agg(startOf('month', now)) });
       }
       if (a === 'peak-hours') {

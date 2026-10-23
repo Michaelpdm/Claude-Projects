@@ -1,4 +1,4 @@
-// End-to-end API smoke test. Usage: BASE=http://localhost:5000 node scripts/smoke-api.mjs
+// End-to-end API smoke test. Usage: BASE=http://localhost:5000 OWNER_PIN=<owner pin, omit on a fresh store> node scripts/smoke-api.mjs
 // Creates clearly-labelled "ZZ Test" rows and removes them again. Run against an empty/dev store.
 const BASE = (process.env.BASE || 'http://localhost:5000') + '/api';
 let failed = 0;
@@ -18,7 +18,7 @@ async function call(method, path, { token, body } = {}) {
 }
 const login = async (role, pin) => (await call('POST', '/settings/verify-pin', { body: { role, pin } })).data?.token;
 
-const owner = await login('owner', '0000');
+const owner = await login('owner', process.env.OWNER_PIN || '0000');
 check('owner can sign in on a fresh store', !!owner);
 await call('PUT', '/settings', { token: owner, body: { manager_pin: '2222', staff_pin: '3333' } });
 const manager = await login('manager', '2222');
