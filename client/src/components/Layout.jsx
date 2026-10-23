@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MobileHeader from './MobileHeader';
 import TopBar from './TopBar';
+import AssistantDock from './AssistantDock';
 
 export default function Layout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -41,6 +42,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      <AssistantDock />
     </div>
   );
 }

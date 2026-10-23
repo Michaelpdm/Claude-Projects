@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Wifi, WifiOff, RefreshCw, LogOut, ShieldCheck, Eye, EyeOff, Key, AlertTriangle } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
@@ -216,6 +216,39 @@ export default function Settings() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── ASSISTANT: PAYMENT & SHOP INFO ── */}
+      <div className="card space-y-4">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-50">Assistant: payment and shop info</h2>
+          <p className="text-sm text-zinc-400">The WhatsApp assistant uses these when a customer is ready to pay or asks about delivery and opening times.</p>
+        </div>
+        {[
+          { key: 'bank_name', label: 'Bank name', placeholder: 'e.g. GTBank' },
+          { key: 'account_number', label: 'Account number', placeholder: '10 digits', numeric: true },
+          { key: 'account_name', label: 'Account name', placeholder: 'Name on the account' },
+          { key: 'delivery_info', label: 'Delivery info (optional)', placeholder: 'e.g. Lagos delivery is ₦3,000, 1 to 2 days' },
+          { key: 'opening_hours', label: 'Opening hours (optional)', placeholder: 'e.g. 10am to 7pm, Monday to Saturday' },
+        ].map(({ key, label, placeholder, numeric }) => (
+          <div key={key}>
+            <label className="label" htmlFor={`set-${key}`}>{label}</label>
+            <div className="flex gap-2">
+              <input
+                id={`set-${key}`}
+                className="input flex-1"
+                placeholder={placeholder}
+                inputMode={numeric ? 'numeric' : undefined}
+                maxLength={numeric ? 10 : 200}
+                value={settings[key] || ''}
+                onChange={e => setSettings(s => ({ ...s, [key]: numeric ? e.target.value.replace(/\D/g, '') : e.target.value }))}
+              />
+              <button className="btn-primary" disabled={saving === key} onClick={() => saveSetting(key, settings[key] || '')}>
+                {saving === key ? 'Saving...' : <><Save size={14} /> Save</>}
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* ── OWNER AVAILABILITY ── */}

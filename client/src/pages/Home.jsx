@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { MessageCircle, Plus, ReceiptText, ShoppingBag, UserPlus, PackageOpen, TriangleAlert } from 'lucide-react';
 import { apiFetch } from '../utils/api';
-import { isDemo, demoAddActivity, demoRecordChatSale } from '../demo/mockApi';
-import PhoneChat from '../demo/PhoneChat';
+import { isDemo } from '../demo/mockApi';
 import {
   Card, Delta, Donut, Heatmap, Kpi, Ring, naira, nairaCompact, useChartColors, useCountUp,
 } from '../components/dash';
@@ -26,8 +25,6 @@ export default function Home() {
   const C = useChartColors();
   const [d, setD] = useState(null);
   const [failed, setFailed] = useState(false);
-  const [replies, setReplies] = useState(23);
-  const [leads, setLeads] = useState(9);
   const demo = isDemo();
 
   const load = useCallback(async () => {
@@ -42,18 +39,6 @@ export default function Home() {
     const t = setInterval(load, demo ? 4000 : 60000);
     return () => clearInterval(t);
   }, [load, demo]);
-
-  const onChatEvent = useCallback((ev) => {
-    if (ev.type === 'lead') {
-      setLeads((n) => n + 1);
-      setReplies((n) => n + 1);
-      demoAddActivity({ type: 'lead', title: ev.label, meta: 'WhatsApp assistant' });
-    } else {
-      if (ev.type === 'sale') demoRecordChatSale(ev);
-      demoAddActivity({ type: ev.type, title: ev.product, meta: `${ev.buyer} · ${ev.channel}`, amount: ev.amount });
-    }
-    load();
-  }, [load]);
 
   const revenue = useCountUp(d?.today.revenue || 0, 900);
 
@@ -217,25 +202,6 @@ export default function Home() {
 
         {/* right column */}
         <div className="col-span-12 flex flex-col gap-3 xl:col-span-4">
-          {demo ? (
-            <Card title="WhatsApp assistant" right={<span className="badge badge-green">Owner away · replying</span>}>
-              <PhoneChat onEvent={onChatEvent} />
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                {[['Auto-replies', replies], ['Leads saved', leads], ['Avg reply', '3s']].map(([l, v]) => (
-                  <div key={l} className="rounded-lg bg-zinc-800 py-2"><div className="text-[15px] font-semibold">{v}</div><div className="text-[10px] text-zinc-400">{l}</div></div>
-                ))}
-              </div>
-            </Card>
-          ) : (
-            <Card title="WhatsApp assistant">
-              <div className="py-4 text-center text-sm text-zinc-400">
-                <MessageCircle className="mx-auto mb-2 text-gold-500" size={22} />
-                Not connected yet. When it is, it will answer customers automatically while you’re away.
-                <div className="mt-3"><Link to="/settings" className="btn-secondary">Open settings</Link></div>
-              </div>
-            </Card>
-          )}
-
           <Card title="Live activity" right={<span className="flex items-center gap-1 text-[11px] text-zinc-400"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-peri" />live</span>}>
             {d.activity.length === 0 ? <p className="py-6 text-center text-sm text-zinc-500">Sales and messages will show up here</p> : (
               <ul className="space-y-2">

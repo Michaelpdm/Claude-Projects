@@ -6,7 +6,7 @@ import { HttpError, requireRole, signToken, wrap } from '../http.js';
 const router = Router();
 const PIN_KEYS = ['owner_pin', 'manager_pin', 'staff_pin'];
 const PUBLIC_KEYS = ['store_name', 'currency'];
-const EDITABLE = ['store_name', 'store_phone', 'currency', 'owner_available', 'away_message', 'daily_target', ...PIN_KEYS];
+const EDITABLE = ['store_name', 'store_phone', 'currency', 'owner_available', 'away_message', 'daily_target', 'bank_name', 'account_number', 'account_name', 'delivery_info', 'opening_hours', ...PIN_KEYS];
 const ROLES = ['owner', 'manager', 'staff'];
 const MAX_ATTEMPTS = 10;
 
@@ -27,6 +27,7 @@ async function saveSetting(key, value) {
     if (!/^\d{4}$/.test(stored)) throw new HttpError(400, 'PIN must be exactly 4 digits');
     stored = await bcrypt.hash(stored, 10);
   }
+  if (key === 'account_number' && stored && !/^\d{10}$/.test(stored)) throw new HttpError(400, 'Account number must be 10 digits');
   if (key === 'daily_target' && !(parseFloat(stored) >= 0)) throw new HttpError(400, 'Target must be a number');
   await query(
     'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',

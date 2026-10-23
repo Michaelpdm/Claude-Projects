@@ -166,6 +166,9 @@ function build() {
       store_name: 'Atelier Lagos', store_phone: '+234 803 555 0100', currency: 'NGN', owner_available: 'true',
       away_message: 'Hello! The team is away right now. Here is what we have in stock:', daily_target: String(dailyTarget),
       owner_pin: 'set', manager_pin: 'set', staff_pin: 'set',
+      bank_name: 'GTBank', account_number: '0123456789', account_name: 'Atelier Lagos Ltd',
+      delivery_info: 'Yes! Island delivery is ₦2,500 (same day). Mainland incl. Ikeja is ₦3,500 (1 to 2 days).',
+      opening_hours: '10am to 7pm, Monday to Saturday',
     },
     seq: { sale: sales.length, product: products.length, customer: customers.length, expense: expenses.length, debit: 20, invoice: invoices.length, ret: 2 },
   };
