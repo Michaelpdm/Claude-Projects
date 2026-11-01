@@ -11,3 +11,6 @@ client/dist/
 
 .vercel
 .env*
+
+# separate project that lives next to the store app; never track it here
+anthony-portfolio/
