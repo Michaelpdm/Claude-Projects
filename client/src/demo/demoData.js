@@ -1,4 +1,4 @@
-// Deterministic demo dataset for "Atelier Lagos". Nothing here touches the real database.
+// Deterministic demo dataset for "Anthony Lagos". Nothing here touches the real database.
 
 export function rng(seed) {
   let s = seed >>> 0;
@@ -11,7 +11,7 @@ export function rng(seed) {
   };
 }
 
-export const STORE = { name: 'Atelier Lagos', area: 'Lekki, Lagos', target: 2700000 };
+export const STORE = { name: 'Anthony Lagos', area: 'Lekki, Lagos', target: 2700000 };
 
 export const naira = (n) => `₦${Math.round(n).toLocaleString('en-NG')}`;
 export const nairaCompact = (n) =>
@@ -114,7 +114,7 @@ export const SCENARIOS = [
       { from: 'customer', text: 'Good evening, do you have the Ankara maxi dress in size 12?' },
       {
         from: 'bot',
-        text: "Good evening Chioma 👋 Thanks for messaging Atelier Lagos. The team is away until 9am, but I can help right now.\n\nYes, the Ankara Maxi Dress is available in size 12 (3 left).",
+        text: "Good evening Chioma 👋 Thanks for messaging Anthony Lagos. The team is away until 9am, but I can help right now.\n\nYes, the Ankara Maxi Dress is available in size 12 (3 left).",
       },
       {
         from: 'bot',

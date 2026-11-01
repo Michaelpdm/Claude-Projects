@@ -1,5 +1,5 @@
 // Demo Mode backend: answers the same /api requests as the real server from an in-memory,
-// deterministic dataset ("Atelier Lagos"). Nothing here is sent anywhere or saved.
+// deterministic dataset ("Anthony Lagos"). Nothing here is sent anywhere or saved.
 import { buildDashboard } from '../../shared/dashboard.js';
 import { rng } from './demoData.js';
 
@@ -163,10 +163,10 @@ function build() {
       { id: 2, sale_id: 9, product_id: 12, quantity: 1, refund_amount: 28500, reason: 'Defective strap', created_at: new Date(now - 9 * DAY).toISOString() },
     ],
     settings: {
-      store_name: 'Atelier Lagos', store_phone: '+234 803 555 0100', currency: 'NGN', owner_available: 'true',
+      store_name: 'Anthony Lagos', store_phone: '+234 803 555 0100', currency: 'NGN', owner_available: 'true',
       away_message: 'Hello! The team is away right now. Here is what we have in stock:', daily_target: String(dailyTarget),
       owner_pin: 'set', manager_pin: 'set', staff_pin: 'set',
-      bank_name: 'GTBank', account_number: '0123456789', account_name: 'Atelier Lagos Ltd',
+      bank_name: 'GTBank', account_number: '0123456789', account_name: 'Anthony Lagos Ltd',
       delivery_info: 'Yes! Island delivery is ₦2,500 (same day). Mainland incl. Ikeja is ₦3,500 (1 to 2 days).',
       opening_hours: '10am to 7pm, Monday to Saturday',
     },
